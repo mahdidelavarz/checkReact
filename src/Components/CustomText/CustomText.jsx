@@ -1,5 +1,5 @@
 import React from 'react';
-import { span } from 'react-native';
+
 
 let yekanBold = 'iranyekanwebbold(fanum)';
 let yekanRegular = 'iranyekanweblight(fanum)';

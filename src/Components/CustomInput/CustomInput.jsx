@@ -1,15 +1,14 @@
-import React, { Component } from 'react'
-import { div, TextInput, img, button } from 'react-native';
+import React, { Component } from 'react';
+import { TextInput, Image, TouchableOpacity } from 'react-native';
 
 import { ic_eye, ic_off_eye } from '../Images/Images';
-import colors from '../../Assets/Styles/Colors';
-import styles from './Styles';
+import { colors } from '../../Assets/Styles/Colors';
 
 class CustomInput extends Component {
     constructor(props) {
         super(props);
         if (this.props.onRef != null) {
-            this.props.onRef(this)
+            this.props.onRef(this);
         }
         this.state = {
             isVisiblePassword: false
@@ -32,16 +31,20 @@ class CustomInput extends Component {
         const { style, placeholder, event, keyboardType, mode, autoCapitalize } = this.props;
         const { isVisiblePassword } = this.state;
         return (
-            <div>
-                {mode === 'password' ?
-                    <button style={styles.btn_visible} onPress={this.onPressIsVisiblePassword}>
-                        <img style={styles.btn_visible_ic} source={!isVisiblePassword ? ic_eye : ic_off_eye} />
-                    </button>
-                    :
-                    null
-                }
+            <div className="relative">
+                {mode === 'password' && (
+                    <TouchableOpacity 
+                        style="absolute right-1 bottom-0 z-10"
+                        onPress={this.onPressIsVisiblePassword}
+                    >
+                        <Image 
+                            style="w-5 h-5" 
+                            source={!isVisiblePassword ? ic_eye : ic_off_eye} 
+                        />
+                    </TouchableOpacity>
+                )}
                 <TextInput
-                    style={[styles.input, style]}
+                    style={`w-full h-8 rounded-full text-sm text-left p-2 bg-white border border-light-txt mt-2 ${style}`}
                     placeholder={placeholder}
                     ref={input => this.textInput = input}
                     onSubmitEditing={this.onSubmitEditing.bind(this)}
@@ -54,5 +57,6 @@ class CustomInput extends Component {
             </div>
         );
     }
-};
+}
+
 export default CustomInput;
