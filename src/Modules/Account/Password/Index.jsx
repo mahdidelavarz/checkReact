@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, div, StatusBar, BackHandler, I18nManager, TextInput } from 'react-native';
+import { ImageBackground, StatusBar, BackHandler, I18nManager, TextInput } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
 
 import { auto_back, auto_back_rtl } from '../../../Components/Images/Images';
@@ -8,7 +8,6 @@ import CustomText from '../../../Components/CustomText/CustomText';
 import colors from '../../../Assets/Styles/Colors';
 import language from '../../../Assets/i18n/i18n';
 import Storage from '../../../Factories/Storage';
-import styles from './Styles';
 
 let dropDownAlert;
 let storage = new Storage();
@@ -18,7 +17,7 @@ function Password(props) {
 
     useEffect(() => {
         const backAction = () => {
-            props.history.goBack()
+            props.history.goBack();
             return true;
         };
         if (!I18nManager.isRTL) {
@@ -43,24 +42,24 @@ function Password(props) {
     }
 
     return (
-        <ImageBackground style={styles.container} source={back}>
+        <ImageBackground className="flex-1 flex-col" source={back}>
             <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
             <DropdownAlert
                 ref={ref => dropDownAlert = ref}
                 inactiveStatusBarBackgroundColor={colors.dark_green}
                 titleStyle={{ fontFamily: 'iranyekanwebbold(fanum)', fontSize: 12, color: colors.white }}
             />
-            <div style={styles.top} />
-            <div style={styles.center}>
-                <div style={styles.center_top}>
-                    <CustomText font_weight={'bold'} style={styles.center_top_title}>
+            <div className="flex-2.5" />
+            <div className="flex-6 flex-col">
+                <div className="flex-1 justify-center">
+                    <CustomText font_weight={'bold'} className="text-[16px] text-green-500 ml-[40px]">
                         تایید گذرواژه امنیتی
                     </CustomText>
                 </div>
-                <div style={styles.center_bottom}>
-                    <div style={styles.center_bottom_view}>
+                <div className="flex-9 items-center justify-center">
+                    <div className="w-[70%]">
                         <TextInput
-                            style={styles.center_bottom_view_input}
+                            className="w-full h-[35px] rounded-[30px] text-[12px] text-left p-[10px] bg-white border border-[#d3d3d3] mt-[10px]"
                             placeholder={'گذرواژه'}
                             onChangeText={(value) => setCode(value)}
                             keyboardType={'default'}
@@ -69,12 +68,12 @@ function Password(props) {
                         <SimpleButton
                             func={onPressSubmit}
                             title={'تایید'}
-                            btnStyle={{ marginVertical: 15 }}
+                            btnStyle="my-[15px]"
                         />
                     </div>
                 </div>
             </div>
-            <div style={styles.bottom} />
+            <div className="flex-1.5" />
         </ImageBackground>
     );
 };

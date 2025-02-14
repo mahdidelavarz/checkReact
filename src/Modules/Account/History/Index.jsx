@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { div, StatusBar, Dimensions, BackHandler, ActivityIndicator, div, Alert } from 'react-native';
+import { StatusBar, Dimensions, BackHandler, ActivityIndicator, Alert } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import NetInfo from '@react-native-community/netinfo';
 import moment from 'moment-jalaali';
@@ -8,14 +8,12 @@ import CustomText from '../../../Components/CustomText/CustomText';
 import { statusHandle } from '../../../Factories/HttpHandler';
 import Loading from '../../../Components/Loading/Loading';
 import EmptyList from './Components/EmptyList/EmptyList';
-import colors from '../../../Assets/Styles/Colors';
 import language from '../../../Assets/i18n/i18n';
 import Storage from '../../../Factories/Storage';
 import Header from './Components/Header/Header';
 import Chart from './Components/Chart/Chart';
 import { Url } from '../../../Configs/Urls';
 import List from './Components/List/List';
-import styles from './Styles';
 
 const width = Dimensions.get('window').width;
 let storage = new Storage();
@@ -75,7 +73,7 @@ class History extends Component {
             });
             statusHandle(response.status, this.props.history);
             const responseJson = await response.json();
-            let sortedCars1 = responseJson.sort((a, b) => new Date(...b.analysis.register_date.substring(0, 10).split('/').reverse()) -
+            let sortedCars1 = responseJson.sort((a, b) => new Date(...b.analysis.register_date.substring(0, 10).split('/').reverse()) - 
                 new Date(...a.analysis.register_date.substring(0, 10).split('/').reverse()));
             this.setState({
                 data: sortedCars1,
@@ -95,11 +93,11 @@ class History extends Component {
     renderTabBar = (props) => (
         <TabBar
             {...props}
-            indicatorStyle={styles.indicator}
+            indicatorStyle="bg-dark-green h-px"
             getLabelText={({ route }) => route.title}
-            style={styles.tabbar}
-            tabStyle={styles.tab}
-            labelStyle={styles.label}
+            style="bg-green"
+            tabStyle="py-2"
+            labelStyle="text-white text-xs font-bold"
         />
     );
 
@@ -107,7 +105,7 @@ class History extends Component {
         if (text.length > 1) {
             this.setState({ isResultSearch: true });
             const newData = this.filterData.filter((item) => {
-                const itemData = item.analysis.title ? item.analysis.title.toUpperCase() : ''.toUpperCase()
+                const itemData = item.analysis.title ? item.analysis.title.toUpperCase() : ''.toUpperCase();
                 const textData = text.toUpperCase();
                 return itemData.indexOf(textData) > -1;
             });
@@ -121,14 +119,14 @@ class History extends Component {
         switch (route.key) {
             case 'history':
                 return (
-                    <div style={{ flex: 1 }}>
+                    <div className="flex-1">
                         {this.state.isActiveAnalysis ? <DoingAnalysis /> : null}
                         {!this.state.isResultSearch ?
                             <div
                                 data={this.state.data}
-                                style={{ marginBottom: 10 }}
+                                className="mb-10"
                                 ListEmptyComponent={<EmptyList />}
-                                keyExtractor={(index) => index.toString}
+                                keyExtractor={(index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <List item={item} route={this.props} />
                                 )}
@@ -136,9 +134,9 @@ class History extends Component {
                             :
                             <div
                                 data={this.state.data}
-                                style={{ marginBottom: 10 }}
+                                className="mb-10"
                                 ListEmptyComponent={<EmptyList />}
-                                keyExtractor={(index) => index.toString}
+                                keyExtractor={(index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <List item={item} route={this.props} />
                                 )}
@@ -169,16 +167,16 @@ class History extends Component {
 
     render() {
         return (
-            <div style={styles.container}>
+            <div className="flex-1 bg-white">
                 <StatusBar
-                    backgroundColor={colors.dark_green}
-                    barStyle={'light-content'}
+                    backgroundColor="dark-green"
+                    barStyle="light-content"
                 />
                 <Header
                     func_back={() => this.props.history.push('/tabBar')}
                     event={(text) => this.searchData(text)}
                 />
-                {!this.state.isLoading ?
+                {!this.state.isLoading ? 
                     <TabView
                         navigationState={this.state}
                         renderScene={this.renderScene}
@@ -188,8 +186,7 @@ class History extends Component {
                         lazy={true}
                         initialLayout={width}
                     />
-                    :
-                    <Loading />
+                    : <Loading />
                 }
             </div>
         );
@@ -199,24 +196,15 @@ export default History;
 
 function DoingAnalysis() {
     return (
-        <div style={styles.view_active_analysis}>
+        <div className="w-11/12 self-center flex items-center border border-violet rounded-sm h-15 my-2.5">
             <ActivityIndicator
-                style={styles.view_active_analysis_img}
+                className="w-7.5 h-7.5"
                 size="small"
-                color={colors.green}
+                color="green"
             />
-            <CustomText style={styles.view_active_analysis_txt}>
+            <CustomText className="text-dark-txt text-center text-sm">
                 شما یک آنالیز درحال انجام دارید لطفا منتظر بمانید...
-      </CustomText>
+            </CustomText>
         </div>
     );
 }
-
-// checkIsActiveAmalysis(Token, data => {
-//     const result = JSONbig.parse(data);
-//     if (result.status) {
-//         this.setState({
-//             isActiveAnalysis: true
-//         });
-//     }
-// });

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { div, img, div, BackHandler, button } from 'react-native';
+import { div, img, BackHandler, button } from 'react-native';
 import RNFetchBlob from 'react-native-fetch-blob';
 
 import SimpleHeader from '../../../Components/CustomHeader/SimpleHeader/SimpleHeader';
@@ -15,7 +15,6 @@ import colors from '../../../Assets/Styles/Colors';
 import languages from '../../../Assets/i18n/i18n';
 import Storage from '../../../Factories/Storage';
 import { Url } from '../../../Configs/Urls';
-import styles from './Styles';
 
 let Token;
 let fullName;
@@ -59,7 +58,6 @@ class HistoryDetails extends Component {
 
     handleBackButtonClick = () => {
         this.props.history.push('/history');
-        // storage.remove("DetailScroll")
         return true;
     };
 
@@ -138,42 +136,32 @@ class HistoryDetails extends Component {
     render() {
         const { analysis, result, sample, time, date, totalMotile } = this.state;
         return (
-            <div style={styles.container}>
+            <div className="flex-1">
                 <SimpleHeader
                     func={this.handleBackButtonClick}
                     title={languages('history_details')}
                 />
                 {!this.state.isLoading ? (
-                    <div style={{ flex: 1 }}
-                        showsVerticalScrollIndicator={false}
-                    // ref={(ref) => this.scrollView = ref}
-                    // onScroll={(e) => storage.set("DetailScroll", JSON.stringify(e.nativeEvent.contentOffset.y))}
-                    >
-                        <div style={styles.top}>
-                            <img
-                                style={styles.top_img}
-                                resizeMode="contain"
-                                source={happy_boy}
-                            />
+                    <div className="flex-1" showsVerticalScrollIndicator={false}>
+                        <div className="w-full h-48 flex justify-center items-center">
+                            <img className="w-4/5 h-4/5" resizeMode="contain" src={happy_boy} />
                         </div>
-                        <div style={styles.description}>
-                            <div style={styles.description_top}>
-                                <CustomText style={styles.description_top_txt}>
-                                    {analysis.title}
-                                </CustomText>
+                        <div className="w-11/12 self-center border border-gray-400 mt-2 rounded-lg">
+                            <div className="h-8 bg-green-500 flex justify-center items-center">
+                                <CustomText className="text-white text-center">{analysis.title}</CustomText>
                             </div>
-                            <CustomText style={styles.description_txt}>
+                            <CustomText className="text-center self-center text-xs w-11/12 my-2">
                                 {this.state.message}
                             </CustomText>
                             <SimpleButton
-                                btnStyle={styles.description_btn}
-                                titleStyle={styles.description_btn_txt}
+                                btnStyle="w-3/5 self-center mt-2 mb-2"
+                                titleStyle="text-xs"
                                 title={'مشاهده مراکز درمانی'}
                                 func={() => this.props.history.push('/categories')}
                             />
                         </div>
-                        <div style={styles.view_table}>
-                            <CustomText font_weight={'bold'} style={styles.view_table_title}>
+                        <div className="my-2">
+                            <CustomText font_weight="bold" className="text-xl text-black text-center my-1">
                                 Information
                             </CustomText>
                             <HeaderTable
@@ -187,8 +175,8 @@ class HistoryDetails extends Component {
                                 value3={time}
                             />
                         </div>
-                        <div style={styles.view_table}>
-                            <CustomText font_weight={'bold'} style={styles.view_table_title}>
+                        <div className="my-2">
+                            <CustomText font_weight="bold" className="text-xl text-black text-center my-1">
                                 Initial Data
                             </CustomText>
                             <HeaderTable
@@ -212,8 +200,8 @@ class HistoryDetails extends Component {
                                 value3={'thick'}
                             />
                         </div>
-                        <div style={styles.view_table}>
-                            <CustomText font_weight={'bold'} style={styles.view_table_title}>
+                        <div className="my-2">
+                            <CustomText font_weight="bold" className="text-xl text-black text-center my-1">
                                 Motility Result
                             </CustomText>
                             <HeaderTable
@@ -232,7 +220,7 @@ class HistoryDetails extends Component {
                                 value3={'15'}
                             />
                         </div>
-                        <div style={styles.view_table}>
+                        <div className="my-2">
                             <HeaderTable
                                 title1={'Class'}
                                 title2={'Quantity'}
@@ -258,34 +246,34 @@ class HistoryDetails extends Component {
                                 value4={'-'}
                             />
                             <ColumnTable
-                                value1={'Immolite'}
+                                value1={'Immotile'}
                                 value2={Math.round(result.immotile)}
                                 value3={percent(result.immotile, totalMotile, result.immotile)}
                                 value4={'< 60 %'}
                             />
                         </div>
                         <SimpleButton
-                            btnStyle={styles.description_btn}
-                            titleStyle={styles.description_btn_txt}
+                            btnStyle="w-3/5 self-center mt-2 mb-2"
+                            titleStyle="text-xs"
                             title={'دانلود نسخه PDF'}
                             func={this.createPdf}
                         />
-                        <div style={styles.view_result}>
-                            <CustomText font_weight={'bold'} style={styles.view_table_title}>
+                        <div className="w-11/12 self-center">
+                            <CustomText font_weight="bold" className="text-xl text-black text-center my-1">
                                 Processed photo from sample
                             </CustomText>
                             <button
-                                onPress={this.onPressResultImg}
+                                onClick={this.onPressResultImg}
                                 activeOpacity={0.6}>
                                 <img
-                                    style={styles.view_result_img}
-                                    source={{ uri: `file://${this.state.imgUrl}` }}
+                                    className="w-full h-48 rounded-lg"
+                                    src={{ uri: `file://${this.state.imgUrl}` }}
                                 />
                             </button>
                         </div>
                         <SimpleButton
-                            btnStyle={styles.description_btn}
-                            titleStyle={styles.description_btn_txt}
+                            btnStyle="w-3/5 self-center mt-2 mb-2"
+                            titleStyle="text-xs"
                             title={'مشاهده ویدیو تحلیل شده'}
                             func={this.onPressResultVideo}
                         />
@@ -298,6 +286,7 @@ class HistoryDetails extends Component {
         );
     }
 };
+
 export default HistoryDetails;
 
 function percent(value, total, immotile) {

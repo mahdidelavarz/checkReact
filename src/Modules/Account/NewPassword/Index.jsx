@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, div, StatusBar, BackHandler, I18nManager } from 'react-native';
+import { ImageBackground, StatusBar, BackHandler, I18nManager } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
 import NetInfo from '@react-native-community/netinfo';
 import Toast from 'react-native-simple-toast';
@@ -14,7 +14,6 @@ import colors from '../../../Assets/Styles/Colors';
 import language from '../../../Assets/i18n/i18n';
 import Storage from '../../../Factories/Storage';
 import { Url } from '../../../Configs/Urls';
-import styles from './Styles';
 
 class NewPassword extends React.Component {
     constructor(props) {
@@ -68,9 +67,7 @@ class NewPassword extends React.Component {
                 }
             } else {
                 Alert.alert("عدم دسترسی به اینترنت", "لطفا اتصال به اینترنت را چک کنید.",
-                    [{ text: "متوجه شدم" }],
-                    { cancelable: false }
-                );
+                    [{ text: "متوجه شدم" }], { cancelable: false });
             }
         });
     }
@@ -102,22 +99,22 @@ class NewPassword extends React.Component {
 
     render() {
         return (
-            <ImageBackground style={styles.container} source={this.state.back}>
+            <ImageBackground className="flex-1 flex-col" source={this.state.back}>
                 <DropdownAlert
                     ref={ref => this.dropDownAlert = ref}
                     inactiveStatusBarBackgroundColor={colors.dark_green}
                     titleStyle={{ fontFamily: 'iranyekanwebbold(fanum)', fontSize: 12, color: colors.white }}
                 />
                 <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
-                <div style={styles.top} />
-                <div style={styles.center}>
-                    <div style={styles.center_top}>
-                        <CustomText font_weight={'bold'} style={styles.center_top_title}>
+                <div className="flex-2.5" />
+                <div className="flex-6 flex-col">
+                    <div className="flex-1 justify-center">
+                        <CustomText font_weight={'bold'} className="text-[16px] text-green-500 ml-[60px]">
                             تغییر رمز
                         </CustomText>
                     </div>
-                    <div style={styles.center_bottom}>
-                        <div style={styles.center_bottom_view}>
+                    <div className="flex-9 items-center justify-center">
+                        <div className="w-[70%]">
                             <CustomInput
                                 placeholder={language('email')}
                                 event={(value) => this.setState({ email: value })}
@@ -144,12 +141,12 @@ class NewPassword extends React.Component {
                             <SimpleButton
                                 func={this.onPressChangePassword}
                                 title={'تغییر'}
-                                btnStyle={styles.btn}
+                                btnStyle="mt-[15px]"
                             />
                         </div>
                     </div>
                 </div>
-                <div style={styles.bottom} />
+                <div className="flex-1.5" />
                 <LoadingModal isVisible={this.state.isLoading} />
             </ImageBackground>
         );

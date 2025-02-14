@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { div, div, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
-
 import SimpleHeader from '../../../Components/CustomHeader/SimpleHeader/SimpleHeader';
 import SimpleButton from '../../../Components/CustomButton/SimpleButton';
 import CustomInput from '../../../Components/CustomInput/CustomInput';
 import DiscountsList from './Components/DiscountsList/DiscountsList';
 import CustomText from '../../../Components/CustomText/CustomText';
 import Loading from '../../../Components/Loading/Loading';
-import { } from '../../../Components/Images/Images';
-import colors from '../../../Assets/Styles/Colors';
-import language from '../../../Assets/i18n/i18n';
 import Store from '../../../Store/Store';
-import styles from './Styles';
 
-let Token;
 let dropDownAlert;
 function DiscountCode(props) {
     const [discounts, setDiscounts] = useState([]);
@@ -40,43 +34,35 @@ function DiscountCode(props) {
         return true;
     }
 
-
     return (
-        <div style={styles.container}>
-            <DropdownAlert
-                ref={ref => dropDownAlert = ref}
-                inactiveStatusBarBackgroundColor={colors.dark_green}
-                titleStyle={{ fontFamily: 'iranyekanwebbold(fanum)', fontSize: 12, color: colors.white }}
-            />
-            <SimpleHeader
-                func={backAction}
-                title={'کد تخفیف'}
-            />
-            {!isLoading ?
-                <div style={{ flex: 1 }}>
+        <div className="flex flex-col h-full p-4 bg-white">
+            <DropdownAlert ref={ref => dropDownAlert = ref} />
+            <SimpleHeader func={backAction} title={'کد تخفیف'} />
+            {!isLoading ? (
+                <div className="flex flex-col items-center flex-1">
                     <CustomInput
                         placeholder={'کد تخفیف را وارد کنید'}
-                        style={styles.input}
+                        className="w-3/5 h-11 text-center text-base border border-gray-300 rounded-md p-2"
                         event={(value) => setCode(value)}
                         onSubmitEditing={onPressSubmit}
                     />
                     <SimpleButton
-                        btnStyle={styles.btn}
+                        className="w-3/5 h-9 text-center mt-4 bg-blue-500 text-white rounded-md"
                         title={'تایید'}
                         func={onPressSubmit}
                     />
-                    <div style={styles.list_header}>
-                        <CustomText style={styles.list_header_title}>
+                    <div className="w-full h-10 bg-gray-200 mt-8 flex items-center justify-center">
+                        <CustomText className="text-base text-gray-700">
                             لیست کد تخفیف های شما
-                            </CustomText>
+                        </CustomText>
                     </div>
-                    <div style={styles.content}>
+                    <div className="flex-1 w-full">
                         <DiscountsList discounts={discounts} />
                     </div>
                 </div>
-                :
+            ) : (
                 <Loading />
-            }
+            )}
         </div>
     );
 };
