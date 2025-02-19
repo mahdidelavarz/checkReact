@@ -5,9 +5,8 @@ import React from 'react';
 // import Toast from 'react-native-simple-toast';
 // import RNRestart from 'react-native-restart';
 
-import { log, happy_boy } from '../../Components/Images/Images';
 import CustomText from '../../Components/CustomText/CustomText';
-import colors from '../../Assets/Styles/Colors';
+// import {colors} from '../../Assets/Styles/Colors';
 import Storage from '../../Factories/Storage';
 // import language from '../../Assets/i18n/i18n';
 import { downloadJson } from './Controller';
@@ -23,19 +22,19 @@ class Splash extends React.Component {
         };
     }
 
-    componentDidMount() {
-        this.startApp();
-    }
+    // componentDidMount() {
+    //     this.startApp();
+    // }
 
-    startApp() {
-        NetInfo.fetch().then((state) => {
-            if (state.isConnected) {
-                this.getData().catch(err => this.retry());
-            } else {
-                this.internetAlert();
-            }
-        });
-    }
+    // startApp() {
+    //     NetInfo.fetch().then((state) => {
+    //         if (state.isConnected) {
+    //             this.getData().catch(err => this.retry());
+    //         } else {
+    //             this.internetAlert();
+    //         }
+    //     });
+    // }
 
     retry() {
         this.setState({ isBtnRetry: true });
@@ -114,17 +113,17 @@ class Splash extends React.Component {
         const { isBtnRetry } = this.state;
         return (
             <div className="flex flex-col bg-white h-full">
-                <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
-                <Animatable.div
-                    className="flex-3 items-center justify-center"
+                {/* <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} /> */}
+                <div
+                    className="flex-3 items-center justify-center bg-black"
                     animation="zoomIn"
                     duration={1500}
                 >
-                    <img className="w-32 h-32" src={log} />
-                </Animatable.div>
+                    <img className="w-32 h-32" src='/Images/logo.png' />
+                </div>
                 {!isBtnRetry ? (
                     <div className="flex-2 items-center justify-center">
-                        <ActivityIndicator size={'large'} color={colors.green} />
+                        {/* <ActivityIndicator size={'large'} color={colors.green} /> */}
                     </div>
                 ) : (
                     <div className="flex-2 items-center justify-center">
@@ -141,7 +140,7 @@ class Splash extends React.Component {
                 <div className="flex-5 items-center justify-center">
                     <img
                         className="w-4/5 h-4/5 object-center"
-                        src={happy_boy}
+                        src='/Images/happy_boy.png'
                         alt="Happy Boy"
                     />
                 </div>

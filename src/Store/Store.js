@@ -1,37 +1,33 @@
-import { observable, action } from 'mobx';
+import { makeAutoObservable } from "mobx";
 
 class Store {
-    @observable tabBarIndex = 0; // back handle in tabbar and profile
+  tabBarIndex = 0;  // Back handle in tabbar and profile
+  cameraZoom = 0;   // Camera zoom from record
+  token = null;     // User token
 
-    @action
-    incrementTabBar() {
-        this.tabBarIndex = 1;
-    };
+  constructor() {
+    makeAutoObservable(this);
+  }
 
-    @action
-    decrementTabBar() {
-        this.tabBarIndex = 0;
-    };
+  incrementTabBar() {
+    this.tabBarIndex = 1;
+  }
 
+  decrementTabBar() {
+    this.tabBarIndex = 0;
+  }
 
-    @observable cameraZoom = 0; // camera zoom from record
+  setCameraZoom(zoom) {
+    this.cameraZoom = zoom;
+  }
 
-    @action
-    setCameraZoom(zoom) {
-        this.cameraZoom = zoom;
-    };
+  setToken(data) {
+    this.token = data;
+  }
 
+  clearToken() {
+    this.token = null;
+  }
+}
 
-    @observable token = null; // token user
-
-    @action
-    setToken(data) {
-        this.token = data;
-    };
-
-    @action
-    clearToken() {
-        this.token = null;
-    };
-};
 export default new Store();
