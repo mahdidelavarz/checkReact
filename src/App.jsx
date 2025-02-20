@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { I18nextProvider } from 'react-i18next';
+import i18next from './assets/i18n/i18n'; // Adjust path
 import './App.css'
 
 import Splash from './Modules/Splash/Index';
+import Home from './Modules/Home/Index';
 // import LogIn from './Modules/Account/LogIn/Index';
 // import SignIn from './Modules/Account/SignIn/Index';
 // import SignUp from './Modules/Account/SignUp/Index';
@@ -57,11 +60,12 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Splash />} />
-        {/* <Route key={"splash"} exact path={"/"} element={Splash} /> */}
-        {/* <Route key={"logIn"} exact path={"/logIn"} element={LogIn} />
+    <I18nextProvider i18n={i18next}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {/* <Route key={"splash"} exact path={"/"} element={Splash} /> */}
+          {/* <Route key={"logIn"} exact path={"/logIn"} element={LogIn} />
         <Route key={"SignIn"} exact path={"/SignIn"} element={SignIn} />
         <Route key={"signUp"} exact path={"/signUp"} element={SignUp} />
         <Route key={"password"} exact path={"/password"} element={Password} />
@@ -108,8 +112,9 @@ function App() {
         <Route key={"resultImg"} exact path={"/resultImg/:id"} element={ResultImg} />
         <Route key={"resultVideo"} exact path={"/resultVideo/:id"} element={ResultVideo} /> */}
 
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </I18nextProvider>
   )
 }
 

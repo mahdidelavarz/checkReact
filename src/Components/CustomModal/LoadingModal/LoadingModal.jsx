@@ -1,5 +1,4 @@
 import React from 'react';
-import { loading } from '../../Images/Images';
 import ReactModal from 'react-modal';
 
 function LoadingModal(props) {
@@ -14,7 +13,7 @@ function LoadingModal(props) {
             <div className="flex items-center justify-center w-full h-full">
                 <div className="w-1/2 h-1/2 bg-white rounded-lg border border-green-500 flex items-center justify-center">
                     <img 
-                        src={loading} 
+                        src="/Images/loading" 
                         alt="Loading" 
                         className="w-11/12 h-11/12 object-cover"
                     />

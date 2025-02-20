@@ -1,35 +1,31 @@
-import { I18nManager } from 'react-native';
 import Storage from '../Factories/Storage';
+import i18next from '../assets/i18n/i18n'
 
-let storage = new Storage();
+const storage = new Storage();
 
 export function findStates(value, then) {
-    storage.get("states.json", states => {
-        const data = JSON.parse(states);
-        data.forEach(item => {
-            if (item.code === value) {
-                then(item);
-            }
-        });
-    })
-};
+  storage.get("states.json", (states) => {
+    const data = JSON.parse(states);
+    data.forEach((item) => {
+      if (item.code === value) {
+        then(item);
+      }
+    });
+  });
+}
 
 export function findMessages(value, then) {
-    storage.get("messages.json", messages => {
-        const data = JSON.parse(messages);
-        data.forEach(item => {
-            if (item.code === value) {
-                if (I18nManager.isRTL) {
-                    then(item.message_fa);
-                    // return (item.message_en)
-                } else {
-                    then(item.message_en);
-                    // return (item.message_fa)
-                }
-            }
-        });
+  storage.get("messages.json", (messages) => {
+    const data = JSON.parse(messages);
+    data.forEach((item) => {
+      if (item.code === value) {
+        // Use i18next to determine language instead of I18nManager
+        const isRTL = i18next.language === 'fa';
+        then(isRTL ? item.message_fa : item.message_en);
+      }
     });
-};
+  });
+}
 
 // class Filters {
 //     Currency = function (price) {
