@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import './App.css'
 
 import Splash from './Modules/Splash/Index';
+import Home from './Modules/Home/Index';
 // import LogIn from './Modules/Account/LogIn/Index';
 // import SignIn from './Modules/Account/SignIn/Index';
 // import SignUp from './Modules/Account/SignUp/Index';
@@ -59,7 +60,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Splash />} />
+        <Route path="/" element={<Home />} />
         {/* <Route key={"splash"} exact path={"/"} element={Splash} /> */}
         {/* <Route key={"logIn"} exact path={"/logIn"} element={LogIn} />
         <Route key={"SignIn"} exact path={"/SignIn"} element={SignIn} />
