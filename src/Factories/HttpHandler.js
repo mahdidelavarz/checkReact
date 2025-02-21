@@ -1,5 +1,5 @@
-import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-simple-toast';
+// import NetInfo from '@react-native-community/netinfo';
+// import Toast from 'react-native-simple-toast';
 import { Url } from '../Configs/Urls';
 import Storage from './Storage';
 
@@ -34,9 +34,9 @@ export async function GET(api, history) {
 export function statusHandle(status, history) {
     // Status Handler To Fetch Network
     if (status == 401) {
-        Toast.show("کاربری با این مشخصات وجود ندارد");
+        console.log("کاربری با این مشخصات وجود ندارد");
         history.push("/SignIn");
     } else if (status == 500) {
-        Toast.show("خطای سرویس‌ دهنده‌ی داخلی دوباره تلاش کنید");
+        console.log("خطای سرویس‌ دهنده‌ی داخلی دوباره تلاش کنید");
     }
 };
