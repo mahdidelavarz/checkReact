@@ -1,60 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import Toast from 'react-native-simple-toast';
-import { BackHandler } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing Toast
 
-import SimpleHeader from '../../Components/CustomHeader/SimpleHeader/SimpleHeader';
-import { ic_ok, gadgetScan } from '../../Components/Images/Images';
-import CustomText from '../../Components/CustomText/CustomText';
-import { statusHandle } from '../../Factories/HttpHandler';
-import { findMessages } from '../../Filters/Filters';
-import Storage from '../../Factories/Storage';
-import { Url } from '../../Configs/Urls';
+import SimpleHeader from "../../Components/CustomHeader/SimpleHeader/SimpleHeader";
+import { ic_ok, gadgetScan } from "../../Components/Images/Images";
+import CustomText from "../../Components/CustomText/CustomText";
+import { findMessages } from "../../Filters/Filters";
+import storage from "../../Factories/Storage"; // Import functional storage
+import { Url } from "../../Configs/Urls";
 
 let Token;
-let storage = new Storage();
 
-function AttachGadget(props) {
-    const [code] = useState(props.match.params.code);
+function AttachGadget() {
+    const navigate = useNavigate();
+    const { code } = useParams(); // Replacing props.match.params.code
+    const [tokenFetched, setTokenFetched] = useState(false); // Track token fetch completion
 
     useEffect(() => {
-        const backAction = () => { props.history.goBack(); return true; };
-        storage.get("Token", data => { Token = data });
-        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
-        return () => backHandler.remove();
-    }, []);
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            navigate(-1);
+            return true;
+        };
+        window.addEventListener("popstate", handleBack);
+
+        // Fetch token
+        storage.get("Token", (data) => {
+            Token = data;
+            setTokenFetched(true); // Mark token as fetched
+        });
+
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
 
     const onPressAttachGadget = async () => {
+        if (!tokenFetched || !Token) {
+            toast.error("لطفاً ابتدا وارد شوید"); // Notify if token isn’t ready
+            return;
+        }
+
         try {
             const response = await fetch(`${Url.serverUrl}Analysis/gadgets/`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'token ' + Token
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `token ${Token}`,
                 },
-                body: JSON.stringify({ "serial_number": code })
+                body: JSON.stringify({ serial_number: code }),
             });
-            if (response.status == 201) {
-                props.history.push("/secondStep");
+            if (response.status === 201) {
+                navigate("/secondStep");
             }
             const responseJson = await response.json();
-            findMessages(responseJson.detail, message => {
-                Toast.show(message);
+            findMessages(responseJson.detail, (message) => {
+                toast.info(message); // Replacing Toast.show
             });
         } catch (error) {
-            Toast.show("خطای سرویس‌ دهنده‌ی داخلی دوباره تلاش کنید");
+            toast.error("خطای سرویس‌دهنده‌ی داخلی. دوباره تلاش کنید"); // Replacing Toast.show
         }
-    }
+    };
+
+    const handleBack = () => {
+        navigate("/qRCodeScan");
+    };
 
     return (
-        <div className="flex flex-col h-full bg-white">
-            <SimpleHeader
-                func={() => props.history.push('/qRCodeScan')}
-                title={'اضافه کردن گجت'}
-            />
+        <div className="flex flex-col min-h-screen bg-white">
+            <SimpleHeader func={handleBack} title="اضافه کردن گجت" />
             <div className="flex flex-col flex-1">
                 <div className="flex-2 flex flex-col items-center justify-center">
-                    <img className="w-[60%] h-[60%] object-contain" src={gadgetScan} alt="Gadget Scan" />
+                    <img
+                        className="w-[60%] h-[60%] object-contain"
+                        src={gadgetScan}
+                        alt="Gadget Scan"
+                    />
                     <CustomText className="text-lg text-gray-800 text-center w-[95%]">
                         کد گجت با موفقیت ثبت شد
                     </CustomText>
@@ -65,7 +85,11 @@ function AttachGadget(props) {
                         onClick={onPressAttachGadget}
                     >
                         <CustomText className="text-white text-base">افزودن</CustomText>
-                        <img className="w-[25px] h-[25px] object-contain text-white" src={ic_ok} alt="OK Icon" />
+                        <img
+                            className="w-[25px] h-[25px] object-contain"
+                            src={ic_ok}
+                            alt="OK Icon"
+                        />
                     </button>
                 </div>
             </div>

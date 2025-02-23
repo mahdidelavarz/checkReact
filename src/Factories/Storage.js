@@ -1,147 +1,84 @@
-// import AsyncStorage from "@react-native-community/async-storage";
-
-class Storage {
-
-    // set data local storage
-    set = async function (key, value) {
+// storage.js
+const storage = {
+    // Set data in localStorage
+    set(key, value) {
         try {
-            await AsyncStorage.setItem(key, value);
+            const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+            localStorage.setItem(key, stringValue);
         } catch (e) {
-            console.log("error", e);
+            console.error("Error setting data in localStorage:", e);
         }
-    };
+    },
 
-    // get data local storage
-    get = async function (key, then) {
+    // Get data from localStorage
+    get(key) {
         try {
-            data = await AsyncStorage.getItem(key);
-            then(data);
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null; // Parse JSON or return null
         } catch (e) {
-            console.log("error", e);
+            console.error("Error getting data from localStorage:", e);
+            return null; // Return null on error or invalid JSON
         }
-    };
+    },
 
-    // remove data local storage
-    remove = async function (key) {
+    // Remove data from localStorage
+    remove(key) {
         try {
-            await AsyncStorage.removeItem(key);
-            console.log('Done.')
+            localStorage.removeItem(key);
+            console.log("Data removed successfully.");
         } catch (e) {
-            console.log("error", e);
+            console.error("Error removing data from localStorage:", e);
         }
-    };
+    },
 
-    // multi set data local storage
-    multiSet = async function (keys) {
+    // Multi set data in localStorage
+    multiSet(keys) {
         try {
-            await AsyncStorage.multiSet(keys);
-        } catch {
-            console.log("error", e);
-        }
-    }
-
-    // multi get data local storage
-    multiGet = async function (keys, then) {
-        try {
-            data = await AsyncStorage.multiGet(keys);
-            then(data);
-        } catch {
-            console.log("error", e);
-        }
-    }
-
-    // multi remove data local storage
-    multiRemove = async function (keys) {
-        try {
-            await AsyncStorage.multiRemove(keys);
-            console.log('Done.')
+            keys.forEach(([key, value]) => {
+                const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+                localStorage.setItem(key, stringValue);
+            });
         } catch (e) {
-            console.log("error", e);
+            console.error("Error in multiSet in localStorage:", e);
         }
-    };
+    },
 
-    // remove all data local storage
-    clearAll = async function () {
+    // Multi get data from localStorage
+    multiGet(keys) {
         try {
-            await AsyncStorage.clear();
+            return keys.map((key) => {
+                const value = localStorage.getItem(key);
+                try {
+                    return [key, value ? JSON.parse(value) : null];
+                } catch {
+                    return [key, value]; // Fallback to raw string if JSON parsing fails
+                }
+            });
         } catch (e) {
-            console.log("error", e);
+            console.error("Error in multiGet from localStorage:", e);
+            return []; // Return empty array on error
         }
-        console.log('Done.')
-    }
+    },
 
+    // Multi remove data from localStorage
+    multiRemove(keys) {
+        try {
+            keys.forEach((key) => localStorage.removeItem(key));
+            console.log("Multiple items removed successfully.");
+        } catch (e) {
+            console.error("Error in multiRemove from localStorage:", e);
+        }
+    },
+
+    // Clear all data from localStorage
+    clearAll() {
+        try {
+            localStorage.clear();
+            console.log("localStorage cleared successfully.");
+        } catch (e) {
+            console.error("Error clearing localStorage:", e);
+        }
+    },
 };
-export default Storage;
 
-
-// class Storage {
-//     // Set data in localStorage
-//     set = async (key, value) => {
-//         try {
-//             localStorage.setItem(key, value);
-//         } catch (e) {
-//             console.error("Error setting data:", e);
-//         }
-//     };
-
-//     // Get data from localStorage
-//     get = async (key, then) => {
-//         try {
-//             const data = localStorage.getItem(key);
-//             then(data);
-//         } catch (e) {
-//             console.error("Error getting data:", e);
-//         }
-//     };
-
-//     // Remove data from localStorage
-//     remove = async (key) => {
-//         try {
-//             localStorage.removeItem(key);
-//             console.log("Done.");
-//         } catch (e) {
-//             console.error("Error removing data:", e);
-//         }
-//     };
-
-//     // Multi set data in localStorage
-//     multiSet = async (keys) => {
-//         try {
-//             keys.forEach(([key, value]) => localStorage.setItem(key, value));
-//         } catch (e) {
-//             console.error("Error in multiSet:", e);
-//         }
-//     };
-
-//     // Multi get data from localStorage
-//     multiGet = async (keys, then) => {
-//         try {
-//             const data = keys.map((key) => [key, localStorage.getItem(key)]);
-//             then(data);
-//         } catch (e) {
-//             console.error("Error in multiGet:", e);
-//         }
-//     };
-
-//     // Multi remove data from localStorage
-//     multiRemove = async (keys) => {
-//         try {
-//             keys.forEach((key) => localStorage.removeItem(key));
-//             console.log("Done.");
-//         } catch (e) {
-//             console.error("Error in multiRemove:", e);
-//         }
-//     };
-
-//     // Clear all data from localStorage
-//     clearAll = async () => {
-//         try {
-//             localStorage.clear();
-//             console.log("Done.");
-//         } catch (e) {
-//             console.error("Error clearing storage:", e);
-//         }
-//     };
-// }
-
-// export default Storage;
+export default storage;

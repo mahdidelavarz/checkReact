@@ -1,61 +1,53 @@
-import React, { Component } from 'react';
-import { BackHandler } from 'react-native';
-import DropdownAlert from 'react-native-dropdownalert';
-import Toast from 'react-native-simple-toast';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing DropdownAlert and Toast
 
-import LoadingModal from '../../../Components/CustomModal/LoadingModal/LoadingModal';
-import HelpHeader from '../../../Components/Analysis/HelpHeader/HelpHeader';
-import CloseModal from '../../../Components/Analysis/CloseModal/CloseModal';
-import HelpModal from '../../../Components/Analysis/HelpModal/HelpModal';
-import CustomText from '../../../Components/CustomText/CustomText';
-import Footer from '../../../Components/Analysis/Footer/Footer';
-import { statusHandle } from '../../../Factories/HttpHandler';
-import RowList from './Components/RowList/RowList';
-import languages from '../../../Assets/i18n/i18n';
-import Storage from '../../../Factories/Storage';
-import { Url } from '../../../Configs/Urls';
+import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
+import HelpHeader from "../../../Components/Analysis/HelpHeader/HelpHeader";
+import CloseModal from "../../../Components/Analysis/CloseModal/CloseModal";
+import HelpModal from "../../../Components/Analysis/HelpModal/HelpModal";
+import CustomText from "../../../Components/CustomText/CustomText";
+import Footer from "../../../Components/Analysis/Footer/Footer";
+import { statusHandle } from "../../../Factories/HttpHandler";
+import RowList from "./Components/RowList/RowList";
+import languages from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage"; // Import functional storage
+import { Url } from "../../../Configs/Urls";
 
-let storage = new Storage();
-class FourStep extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isCloseModal: false,
-            isHelpModal: false,
-            isLoading: false
+function FourStep() {
+    const navigate = useNavigate();
+    const [isCloseModal, setIsCloseModal] = useState(false);
+    const [isHelpModal, setIsHelpModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            setIsCloseModal(true);
+            return true;
         };
-    }
+        window.addEventListener("popstate", handleBack);
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
-
-    handleBackButtonClick = () => {
-        this.setState({ isCloseModal: true });
-        return true;
-    }
-
-    onPressNextStep = () => {
-        storage.get("Token", token => {
-            storage.get("SerialNumber", serialNumber => {
-                storage.get("Title", title => {
-                    storage.get("Color", color => {
-                        storage.get("Volume", volume => {
-                            storage.get("Viscosity", viscosity => {
+    const onPressNextStep = () => {
+        storage.get("Token", (token) => {
+            storage.get("SerialNumber", (serialNumber) => {
+                storage.get("Title", (title) => {
+                    storage.get("Color", (color) => {
+                        storage.get("Volume", (volume) => {
+                            storage.get("Viscosity", (viscosity) => {
                                 if (!title) {
-                                    this.dropDownAlert.alertWithType('warn', "لطفا عنوان را پر کنید");
+                                    toast.warn("لطفا عنوان را پر کنید"); // Replacing DropdownAlert
                                 } else if (!color) {
-                                    this.dropDownAlert.alertWithType('warn', "لطفا رنگ را انتخاب کنید");
+                                    toast.warn("لطفا رنگ را انتخاب کنید");
                                 } else if (!volume) {
-                                    this.dropDownAlert.alertWithType('warn', "لطفا حجم نمونه را انتخاب کنید");
+                                    toast.warn("لطفا حجم نمونه را انتخاب کنید");
                                 } else if (!viscosity) {
-                                    this.dropDownAlert.alertWithType('warn', "لطفا گرانروی (ویسکوزیتی) را انتخاب کنید");
+                                    toast.warn("لطفا گرانروی (ویسکوزیتی) را انتخاب کنید");
                                 } else {
-                                    this.analysisCreate(token, serialNumber, title, color, volume, viscosity);
+                                    analysisCreate(token, serialNumber, title, color, volume, viscosity);
                                 }
                             });
                         });
@@ -63,84 +55,91 @@ class FourStep extends Component {
                 });
             });
         });
-    }
+    };
 
-    async analysisCreate(token, serialNumber, title, color, volume, viscosity) {
-        this.setState({ isLoading: true });
+    const analysisCreate = async (token, serialNumber, title, color, volume, viscosity) => {
+        setIsLoading(true);
         try {
             const response = await fetch(`${Url.serverUrl}Analysis/create/`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'token ' + token
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `token ${token}`,
                 },
                 body: JSON.stringify({
-                    "serial_number": serialNumber,
-                    "viscosity": viscosity,
-                    "color": color,
-                    "title": title,
-                    "volume": volume,
-                })
+                    serial_number: serialNumber,
+                    viscosity,
+                    color,
+                    title,
+                    volume,
+                }),
             });
-            statusHandle(response.status, this.props.history);
-            if (response.status == 201) {
-                this.setState({ isLoading: false });
-                this.props.history.push('/fiveStep');
+            statusHandle(response.status, navigate); // Updated to use navigate
+            if (response.status === 201) {
+                setIsLoading(false);
+                navigate("/fiveStep");
+            } else {
+                setIsLoading(false);
+                // Optionally handle non-201 statuses with a toast message if needed
             }
         } catch (error) {
-            this.setState({ isLoading: false });
-            console.log("error", error);
+            setIsLoading(false);
+            console.error("Error:", error);
+            toast.error(`${error.message}`); // Optional: Add error feedback
         }
-    }
+    };
 
-    render() {
-        return (
-            <div className="flex flex-col h-screen bg-white">
-                <DropdownAlert
-                    ref={ref => this.dropDownAlert = ref}
-                    inactiveStatusBarBackgroundColor="bg-green-700"
-                    titleStyle="font-bold text-sm text-white"
-                />
-                <HelpHeader
-                    closeFunc={() => this.setState({ isCloseModal: true })}
-                    helpFunc={() => this.setState({ isHelpModal: true })}
-                    count={4}
-                />
-                <div className="flex flex-col flex-1">
-                    <div className="flex flex-col flex-4.5 justify-around">
-                        <CustomText className="text-lg font-bold text-gray-800 text-center my-8">
-                            {languages('sample_prop_head')}
-                        </CustomText>
-                        <CustomText className="text-sm text-gray-800 text-center w-11/12 mx-auto">
-                            {languages('sample_prop_head_description')}
-                        </CustomText>
-                    </div>
-                    <div className="flex flex-4.5 items-center justify-center mb-5">
-                        <RowList />
-                    </div>
-                    <div className="flex justify-center">
-                        <Footer
-                            nextFunc={this.onPressNextStep}
-                            screenCount={4}
-                            line={'30%'}
-                            backFunc={() => this.setState({ isCloseModal: true })}
-                        />
-                    </div>
+    const handleBackButtonClick = () => {
+        setIsCloseModal(true);
+    };
+
+    const onPressCloseAnalysis = () => {
+        setIsCloseModal(false);
+        navigate("/tabBar"); // Assuming this is the intended close destination
+    };
+
+    return (
+        <div className="flex flex-col h-screen bg-white">
+            <HelpHeader
+                closeFunc={handleBackButtonClick}
+                helpFunc={() => setIsHelpModal(true)}
+                count={4}
+            />
+            <div className="flex flex-col flex-1">
+                <div className="flex flex-col flex-4.5 justify-around">
+                    <CustomText className="text-lg font-bold text-gray-800 text-center my-8">
+                        {languages("sample_prop_head")}
+                    </CustomText>
+                    <CustomText className="text-sm text-gray-800 text-center w-11/12 mx-auto">
+                        {languages("sample_prop_head_description")}
+                    </CustomText>
                 </div>
-                <CloseModal
-                    visible={this.state.isCloseModal}
-                    closeFunc={this.onPressCloseAnalysis}
-                    resumeFunc={() => this.setState({ isCloseModal: false })}
-                />
-                <HelpModal
-                    visible={this.state.isHelpModal}
-                    closeFunc={() => this.setState({ isHelpModal: false })}
-                    description={languages('help_modal_txt_step_4')}
-                />
-                <LoadingModal isVisible={this.state.isLoading} />
+                <div className="flex flex-4.5 items-center justify-center mb-5">
+                    <RowList />
+                </div>
+                <div className="flex justify-center">
+                    <Footer
+                        nextFunc={onPressNextStep}
+                        screenCount={4}
+                        line="30%"
+                        backFunc={handleBackButtonClick}
+                    />
+                </div>
             </div>
-        );
-    }
-};
+            <CloseModal
+                visible={isCloseModal}
+                closeFunc={onPressCloseAnalysis}
+                resumeFunc={() => setIsCloseModal(false)}
+            />
+            <HelpModal
+                visible={isHelpModal}
+                closeFunc={() => setIsHelpModal(false)}
+                description={languages("help_modal_txt_step_4")}
+            />
+            <LoadingModal isVisible={isLoading} />
+        </div>
+    );
+}
+
 export default FourStep;

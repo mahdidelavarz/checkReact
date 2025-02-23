@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import DropdownAlert from "react-native-dropdownalert";
-import DeviceInfo from "react-native-device-info";
-import Toast from "react-native-simple-toast";
-
+import { toast } from "react-toastify"; // Replacement for react-native-simple-toast
+import storage from "../../../Factories/Storage";
+import Store from "../../../Store/Store";
 import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
 import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomInput from "../../../Components/CustomInput/CustomInput";
 import CustomText from "../../../Components/CustomText/CustomText";
 import { findMessages } from "../../../Filters/Filters";
-import Storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
-import Store from "../../../Store/Store";
 
 import auto_back from "../../../Components/Images/auto_back.png";
 import auto_back_rtl from "../../../Components/Images/auto_back_rtl.png";
 
-let dropDownAlert;
-let storage = new Storage();
+// No need to instantiate storage; it's already an object
+// let storage = new Storage(); // Remove this line
 
 function ConfirmCode() {
   const navigate = useNavigate();
@@ -41,7 +38,7 @@ function ConfirmCode() {
 
   const onPressSubmit = () => {
     if (!code) {
-      dropDownAlert.alertWithType("warn", "لطفا کد دریافتی را وارد کنید");
+      toast.warn("لطفا کد دریافتی را وارد کنید"); // Replaced DropdownAlert with toast
     } else {
       setIsLoading(true);
       doConfirmCode(code);
@@ -63,19 +60,20 @@ function ConfirmCode() {
       });
       const responseJson = await response.json();
       findMessages(responseJson.detail, (message) => {
-        Toast.show(message);
+        toast.info(message); // Replaced Toast.show with toast
       });
       if (responseJson.detail) {
         doLogin();
       }
     } catch (error) {
-      Toast.show(`${error.message}`);
+      toast.error(`${error.message}`); // Replaced Toast.show with toast
       setIsLoading(false);
     }
   };
 
   const doLogin = async () => {
-    let model = DeviceInfo.getModel();
+    // DeviceInfo.getModel() isn't available in web; use a fallback or skip
+    const model = "web"; // Static value for web, or fetch from navigator if needed
     try {
       const response = await fetch(`${Url.serverUrl}Auth/login/`, {
         method: "POST",
@@ -94,11 +92,11 @@ function ConfirmCode() {
       const responseJson = await response.json();
       setIsLoading(false);
       findMessages(responseJson.detail, (message) => {
-        Toast.show(message);
+        toast.info(message); // Replaced Toast.show with toast
       });
       const token = responseJson.token;
       if (token) {
-        storage.set("Token", token);
+        storage.set("Token", token); // Use functional storage directly
         Store.setToken(token);
         navigate("/tabBar");
       }
@@ -112,17 +110,6 @@ function ConfirmCode() {
       className="flex flex-col h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${back})` }}
     >
-      {/* Alert Component */}
-      <DropdownAlert
-        ref={(ref) => (dropDownAlert = ref)}
-        inactiveStatusBarBackgroundColor="darkgreen"
-        titleStyle={{
-          fontFamily: "iranyekanwebbold(fanum)",
-          fontSize: "12px",
-          color: "white",
-        }}
-      />
-
       {/* Top Section */}
       <div className="flex-2.5" />
 
@@ -137,7 +124,7 @@ function ConfirmCode() {
           <CustomInput
             placeholder="کد دریافتی"
             event={(value) => setCode(value)}
-            keyboardType="default"
+            keyboardType="default" // Might not apply in web; adjust CustomInput if needed
             onSubmitEditing={onPressSubmit}
             mode="password"
           />

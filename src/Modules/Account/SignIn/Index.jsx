@@ -1,159 +1,157 @@
-import React, { Component } from 'react';
-import { ImageBackground, StatusBar, BackHandler, Alert, Platform, I18nManager } from 'react-native';
-import DropdownAlert from 'react-native-dropdownalert';
-import NetInfo from '@react-native-community/netinfo';
-import DeviceInfo from 'react-native-device-info';
-import Toast from 'react-native-simple-toast';
-import { Link } from 'react-router-native';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
+import { Link } from "react-router-dom"; // Replacing react-router-native Link
+import { toast } from "react-toastify"; // Replacing Toast and DropdownAlert
 
-import LoadingModal from '../../../Components/CustomModal/LoadingModal/LoadingModal';
-import { auto_back, auto_back_rtl } from '../../../Components/Images/Images';
-import SimpleButton from '../../../Components/CustomButton/SimpleButton';
-import CustomInput from '../../../Components/CustomInput/CustomInput';
-import CustomText from '../../../Components/CustomText/CustomText';
-import { findMessages } from '../../../Filters/Filters';
-import colors from '../../../Assets/Styles/Colors';
-import language from '../../../Assets/i18n/i18n';
-import Storage from '../../../Factories/Storage';
-import { Url } from '../../../Configs/Urls';
-import Store from '../../../Store/Store';
+import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
+import { auto_back, auto_back_rtl } from "../../../Components/Images/Images";
+import SimpleButton from "../../../Components/CustomButton/SimpleButton";
+import CustomInput from "../../../Components/CustomInput/CustomInput";
+import CustomText from "../../../Components/CustomText/CustomText";
+import { findMessages } from "../../../Filters/Filters";
+import language from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage"; // Import functional storage
+import { Url } from "../../../Configs/Urls";
+import Store from "../../../Store/Store";
 
-let storage = new Storage();
-class SignIn extends Component {
-    constructor(props) {
-        super(props);
-        this.dropDownAlert = null;
-        this.focusNextField = this.focusNextField.bind(this);
-        this.inputs = {};
-        this.state = {
-            email: "",
-            password: "",
-            back: auto_back_rtl,
-            isLoading: false
+function SignIn() {
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [back, setBack] = useState(auto_back_rtl);
+    const [isLoading, setIsLoading] = useState(false);
+    const inputs = useRef({}); // Replacing this.inputs for focusing
+
+    useEffect(() => {
+        // Check document direction instead of I18nManager.isRTL
+        if (document.dir !== "rtl") {
+            setBack(auto_back);
         }
-    }
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        if (!I18nManager.isRTL) {
-            this.setState({ back: auto_back });
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            navigate(-1);
+            return true;
+        };
+        window.addEventListener("popstate", handleBack);
+
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
+
+    const focusNextField = (id) => {
+        if (inputs.current[id]) {
+            inputs.current[id].focus();
         }
-    }
+    };
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
-
-    handleBackButtonClick = () => {
-        this.props.history.goBack();
-        return true;
-    }
-
-    focusNextField(id) {
-        this.inputs[id].focus();
-    }
-
-    onPressLogIn = () => {
-        const { email, password } = this.state;
+    const onPressLogIn = () => {
         if (!email) {
-            this.dropDownAlert.alertWithType('warn', 'لطفا ایمیل خود را وارد کنید');
+            toast.warn("لطفا ایمیل خود را وارد کنید"); // Replacing DropdownAlert
         } else if (!password) {
-            this.dropDownAlert.alertWithType('warn', 'لطفا پسورد را وارد کنید');
+            toast.warn("لطفا پسورد را وارد کنید");
         } else {
-            NetInfo.fetch().then(state => {
-                if (state.isConnected) {
-                    this.setState({ isLoading: true });
-                    DeviceInfo.getMacAddress().then(macAddress => {
-                        this.doLogin(macAddress, email, password);
-                    });
-                } else {
-                    Alert.alert("عدم دسترسی به اینترنت", "لطفا اتصال به اینترنت را چک کنید.",
-                        [{ text: "متوجه شدم" }], { cancelable: false });
-                }
-            });
+            // Replacing NetInfo with navigator.onLine
+            if (navigator.onLine) {
+                setIsLoading(true);
+                // Replacing DeviceInfo.getMacAddress with a random ID
+                const macAddress = "web-" + Math.random().toString(36).substring(2, 15);
+                doLogin(macAddress, email, password);
+            } else {
+                toast.error("عدم دسترسی به اینترنت. لطفا اتصال به اینترنت را چک کنید.");
+            }
         }
-    }
+    };
 
-    async doLogin(macAddress, email, password) {
-        let model = DeviceInfo.getModel();
+    const doLogin = async (macAddress, email, password) => {
+        const model = "web"; // Replacing DeviceInfo.getModel
         try {
             const response = await fetch(`${Url.serverUrl}Auth/login/`, {
-                method: 'POST', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
-                    "platform": Platform.OS,
-                    "mac": macAddress,
-                    "model": model,
-                    "email": email.toLowerCase(),
-                    "password": password
-                })
+                    platform: "web", // Replacing Platform.OS
+                    mac: macAddress,
+                    model,
+                    email: email.toLowerCase(),
+                    password,
+                }),
             });
             const responseJson = await response.json();
             const token = responseJson.token;
             if (token) {
-                storage.set("Token", token);
+                storage.set("Token", token); // Updated to functional storage
                 Store.setToken(token);
-                this.props.history.push('/tabBar');
+                navigate("/tabBar");
             }
-            findMessages(responseJson.detail, message => {
-                Toast.show(message);
+            findMessages(responseJson.detail, (message) => {
+                toast.info(message); // Replacing Toast.show
             });
-            this.setState({ isLoading: false });
+            setIsLoading(false);
         } catch (error) {
-            this.setState({ isLoading: false });
+            setIsLoading(false);
+            toast.error(`${error.message}`);
         }
-    }
+    };
 
-    render() {
-        return (
-            <ImageBackground className="flex-1 flex-col" source={this.state.back}>
-                <DropdownAlert
-                    ref={ref => this.dropDownAlert = ref}
-                    inactiveStatusBarBackgroundColor={colors.dark_green}
-                    titleStyle={{ fontFamily: 'iranyekanwebbold(fanum)', fontSize: 12, color: colors.white }}
-                />
-                <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
-                <div className="flex-2.5"></div>
-                <div className="flex-6 flex-col">
-                    <div className="flex-1 justify-center">
-                        <CustomText font_weight={'bold'} className="text-green-500 text-xl ml-15">
-                            {language('login')}
-                        </CustomText>
-                    </div>
-                    <div className="flex-9 items-center justify-center">
-                        <div className="w-7/10">
-                            <CustomInput
-                                placeholder={language('email')}
-                                event={(value) => this.setState({ email: value })}
-                                keyboardType={'email-address'}
-                                autoCapitalize={'none'}
-                                onSubmitEditing={() => { this.focusNextField('password') }}
-                            />
-                            <CustomInput
-                                placeholder={language('password')}
-                                event={(value) => this.setState({ password: value })}
-                                keyboardType={'default'}
-                                onRef={(ref) => { this.inputs['password'] = ref }}
-                                onSubmitEditing={this.onPressLogIn}
-                                mode={'password'}
-                            />
-                            <SimpleButton
-                                func={this.onPressLogIn}
-                                title={language('login')}
-                                btnStyle="my-4"
-                            />
-                            <Link to={'/forgotPassword'} underlayColor={'transparent'}>
-                                <CustomText className="text-green-500 text-sm my-1">فراموشی رمز عبور؟</CustomText>
-                            </Link>
-                            <Link to={'/signUp'} underlayColor={'transparent'}>
-                                <CustomText className="text-green-500 text-sm my-1">ثبت نام نکرده اید؟</CustomText>
-                            </Link>
-                        </div>
+    const handleBackButtonClick = () => {
+        navigate(-1);
+    };
+
+    return (
+        <div
+            className="flex-1 flex flex-col bg-cover bg-center"
+            style={{ backgroundImage: `url(${back})` }}
+        >
+            {/* DropdownAlert and StatusBar not needed in web */}
+            <div className="flex-2.5" />
+            <div className="flex-6 flex flex-col">
+                <div className="flex-1 flex justify-center">
+                    <CustomText font_weight="bold" className="text-green-500 text-xl ml-15">
+                        {language("login")}
+                    </CustomText>
+                </div>
+                <div className="flex-9 flex items-center justify-center">
+                    <div className="w-7/10">
+                        <CustomInput
+                            placeholder={language("email")}
+                            event={(value) => setEmail(value)}
+                            keyboardType="email-address" // Adjust in CustomInput for web
+                            autoCapitalize="none"
+                            onSubmitEditing={() => focusNextField("password")}
+                        />
+                        <CustomInput
+                            placeholder={language("password")}
+                            event={(value) => setPassword(value)}
+                            keyboardType="default"
+                            onRef={(ref) => (inputs.current["password"] = ref)}
+                            onSubmitEditing={onPressLogIn}
+                            mode="password"
+                        />
+                        <SimpleButton
+                            func={onPressLogIn}
+                            title={language("login")}
+                            btnStyle="my-4"
+                        />
+                        <Link to="/forgotPassword">
+                            <CustomText className="text-green-500 text-sm my-1">
+                                فراموشی رمز عبور؟
+                            </CustomText>
+                        </Link>
+                        <Link to="/signUp">
+                            <CustomText className="text-green-500 text-sm my-1">
+                                ثبت نام نکرده اید؟
+                            </CustomText>
+                        </Link>
                     </div>
                 </div>
-                <div className="flex-1.5"></div>
-                <LoadingModal isVisible={this.state.isLoading} />
-            </ImageBackground>
-        );
-    }
-};
+            </div>
+            <div className="flex-1.5" />
+            <LoadingModal isVisible={isLoading} />
+        </div>
+    );
+}
+
 export default SignIn;

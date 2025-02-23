@@ -1,125 +1,84 @@
-import React, { Component } from 'react';
-import { BackHandler, PermissionsAndroid, Alert } from 'react-native';
-import RNFetchBlob from 'react-native-fetch-blob';
-import Video from 'react-native-video';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // For error messages
 
-import SimpleHeader from '../../../Components/CustomHeader/SimpleHeader/SimpleHeader';
-import Loading from '../../../Components/Loading/Loading';
-import languages from '../../../Assets/i18n/i18n';
-import Storage from '../../../Factories/Storage';
-import { Url } from '../../../Configs/Urls';
+import SimpleHeader from "../../../Components/CustomHeader/SimpleHeader/SimpleHeader";
+import Loading from "../../../Components/Loading/Loading";
+import languages from "../../../assets/i18n/i18n";
+import storage from "../../../Factories/Storage"; // Import functional storage
+import { Url } from "../../../Configs/Urls";
 
-let storage = new Storage();
-class ResultVideo extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            id: this.props.match.params.id,
-            uri: '',
-            isLoading: false
+function ResultVideo() {
+    const navigate = useNavigate();
+    const { id } = useParams(); // Replacing props.match.params.id
+    const [uri, setUri] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            navigate(`/historyDetails/${id}`);
+            return true;
         };
-    }
+        window.addEventListener("popstate", handleBack);
 
-    async requestExternalStoreageRead() {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'Storage Permission',
-                    message: 'App needs access to memory to download the file ',
-                },
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                //Alert.alert("Permission granted","Now you can download anything!");
-            } else {
-                Alert.alert(
-                    'Permission Denied!',
-                    'You need to give storage permission to download the file',
-                );
-            }
-        } catch (err) {
-            console.warn(err);
-        }
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                    title: 'Access Storage',
-                    message: 'Access Storage for the pictures',
-                },
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('You can use read from the storage', granted);
-            } else {
-                console.log('Storage permission denied');
-            }
-        } catch (err) {
-            console.warn(err);
-        }
-    }
-
-    componentDidMount() {
-        this.requestExternalStoreageRead();
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.setState({ isLoading: true });
-        storage.get('Token', (token) => {
-            this.getResultVideo(token);
+        // Fetch video URL
+        setIsLoading(true);
+        storage.get("Token", (token) => {
+            getResultVideo(token);
         });
-    }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate, id]);
 
-    handleBackButtonClick = () => {
-        this.props.history.push(`/historyDetails/${this.state.id}`);
-        return true;
+    const getResultVideo = async (token) => {
+        try {
+            // Replacing RNFetchBlob with fetch for web
+            const response = await fetch(`${Url.serverUrl}Analysis/results/video/?analysis_id=${id}`, {
+                method: "GET",
+                headers: {
+                    Accept: "video/mp4", // Assuming MP4; adjust if different
+                    Authorization: `token ${token}`,
+                },
+            });
+            if (!response.ok) throw new Error("Failed to fetch video");
+            const blob = await response.blob();
+            const videoUrl = URL.createObjectURL(blob); // Create a URL for the video blob
+            setUri(videoUrl);
+            setIsLoading(false);
+        } catch (error) {
+            console.error("Error fetching video:", error);
+            toast.error("Failed to load result video");
+            setIsLoading(false);
+        }
     };
 
-    getResultVideo(token) {
-        RNFetchBlob.config({ fileCache: true })
-            .fetch('GET', `${Url.serverUrl}Analysis/results/video/?analysis_id=${this.state.id}`,
-                {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'token ' + token,
-                },
-            )
-            .then((res) => {
-                this.setState({
-                    uri: res.path(),
-                    isLoading: false,
-                });
-                console.log('r', res.path());
-            })
-            .catch((error) => {
-                console.log('error', error);
-            });
-    }
+    const handleBackButtonClick = () => {
+        navigate(`/historyDetails/${id}`);
+    };
 
-    render() {
-        return (
-            <div className="flex flex-col h-full">
-                <SimpleHeader
-                    func={() => this.props.history.push(`/historyDetails/${this.state.id}`)}
-                    title={'ویدیو تحلیل شده از نمونه'}
-                />
-                {!this.state.isLoading ?
-                    <div className="flex items-center justify-center flex-1">
-                        <Video
-                            source={{ uri: `${this.state.uri}` }}
-                            repeat={true}
-                            resizeMode="stretch"
-                            volume={0.0}
-                            className="absolute inset-0"
-                        />
-                    </div>
-                    :
-                    <Loading />
-                }
-            </div>
-        );
-    }
-};
+    return (
+        <div className="flex flex-col h-screen">
+            <SimpleHeader
+                func={handleBackButtonClick}
+                title="ویدیو تحلیل شده از نمونه"
+            />
+            {!isLoading ? (
+                <div className="flex items-center justify-center flex-1">
+                    <video
+                        src={uri}
+                        controls // Adds play/pause, volume, etc.
+                        autoPlay
+                        loop // Replacing repeat={true}
+                        muted // Replacing volume={0.0}
+                        className="w-full h-full object-fill" // Replacing resizeMode="stretch"
+                    />
+                </div>
+            ) : (
+                <Loading />
+            )}
+        </div>
+    );
+}
 
 export default ResultVideo;

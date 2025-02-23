@@ -1,48 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import LoadingModal from '../../Components/CustomModal/LoadingModal/LoadingModal';
-import SimpleModal from '../../Components/CustomModal/SimpleModal/SimpleModal';
-import { findStates, findMessages } from '../../Filters/Filters';
-import { statusHandle } from '../../Factories/HttpHandler';
-import BoxButton from './Components/BoxButton/BoxButton';
-import Slider from './Components/Slider/Slider';
-import Banner from './Components/Banner/Banner';
-import Storage from '../../Factories/Storage';
-import language from '../../assets/i18n/i18n';
-import { Url } from '../../Configs/Urls';
-import Store from "../../Store/Store";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing route.history
+import { toast } from "react-toastify"; // Replacing Toast
 
-const width = window.innerWidth;
+import LoadingModal from "../../Components/CustomModal/LoadingModal/LoadingModal";
+import SimpleModal from "../../Components/CustomModal/SimpleModal/SimpleModal";
+import { findStates, findMessages } from "../../Filters/Filters";
+import { statusHandle } from "../../Factories/HttpHandler";
+import BoxButton from "./Components/BoxButton/BoxButton";
+import Slider from "./Components/Slider/Slider";
+import Banner from "./Components/Banner/Banner";
+import storage from "../../Factories/Storage"; // Import functional storage
+import language from "../../Assets/i18n/i18n";
+import { Url } from "../../Configs/Urls";
+
 let Token;
-const storage = new Storage();
 
 const isOnline = () => navigator.onLine;
 
-const Home = ({ route }) => {
+function Home() {
+  const navigate = useNavigate();
   const [isResultReadyModal, setIsResultReadyModal] = useState(false);
-  const [descriptionModal, setDescriptionModal] = useState('');
+  const [descriptionModal, setDescriptionModal] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    storage.get("Token", data => Token = data);
-    
+    // Fetch token
+    storage.get("Token", (data) => (Token = data));
+
+    // Check network status
     if (!isOnline()) {
       alertNetwork();
     }
     getDeviceModels();
-  }, []);
+  }, [navigate]);
 
   const getDeviceModels = () => {
-    storage.get("DeviceModel", async data => {
-      const models = JSON.parse(data);
+    storage.get("DeviceModel", async (data) => {
+      const models = data ? JSON.parse(data) : null;
       if (!models) {
         setIsLoading(true);
         try {
-          const response = await fetch("https://daddycheck.s3.ir-thr-at1.arvanstorage.com/devicemodels.json");
+          const response = await fetch(
+            "https://daddycheck.s3.ir-thr-at1.arvanstorage.com/devicemodels.json"
+          );
           const responseJson = await response.json();
           storage.set("DeviceModel", JSON.stringify(responseJson));
           setIsLoading(false);
         } catch (error) {
-          getDeviceModels();
+          toast.error("Failed to fetch device models. Retrying...");
+          getDeviceModels(); // Retry on failure
           setIsLoading(false);
         }
       }
@@ -50,7 +56,7 @@ const Home = ({ route }) => {
   };
 
   const alertNetwork = () => {
-    window.alert('عدم دسترسی به اینترنت\nلطفا اتصال به اینترنت را چک کنید.');
+    toast.error("عدم دسترسی به اینترنت\nلطفا اتصال به اینترنت را چک کنید.");
   };
 
   const onPressGoToAnalysisScreen = () => {
@@ -65,29 +71,32 @@ const Home = ({ route }) => {
     setIsLoading(true);
     try {
       const response = await fetch(`${Url.serverUrl}Analysis/state/`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'token ' + Token
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `token ${Token}`,
         },
       });
-      statusHandle(response.status, route.history);
+      statusHandle(response.status, navigate); // Updated to use navigate
       const responseJson = await response.json();
       setIsLoading(false);
-      findStates(responseJson.state, data => {
+      findStates(responseJson.state, (data) => {
         if (data.is_new_analysis_permitted) {
-          route.history.push('/firstStep');
+          navigate("/firstStep");
         } else if (data.code === "waiting_for_qc1") {
-          route.history.push('/tenStep');
+          navigate("/tenStep");
         } else if (data.code === "waiting_for_qc2") {
-          route.history.push('/elevenStep');
+          navigate("/elevenStep");
         } else if (data.code === "waiting_for_qc3") {
-          route.history.push('/twelveStep');
+          navigate("/twelveStep");
         } else if (data.code === "waiting_for_vids") {
-          route.history.push('/processing');
-        } else if (data.code === "results_ready" || data.code === "waiting_for_results") {
-          findMessages(data.message, message => {
+          navigate("/processing");
+        } else if (
+          data.code === "results_ready" ||
+          data.code === "waiting_for_results"
+        ) {
+          findMessages(data.message, (message) => {
             setDescriptionModal(message);
             setIsResultReadyModal(true);
           });
@@ -95,23 +104,23 @@ const Home = ({ route }) => {
       });
     } catch (error) {
       setIsLoading(false);
+      toast.error("Failed to check analysis state. Please try again.");
     }
   };
 
   const onPressGoToHistoryScreen = () => {
     setIsResultReadyModal(false);
-    route.history.push('/history');
+    navigate("/history");
   };
 
   return (
-    <div className="flex flex-col bg-white min-h-screen">
-      <header 
-        className="flex items-center justify-center border-b border-gray-300 py-4"
-        style={{ backgroundColor: "green" }}
+    <div className="flex flex-col min-h-screen bg-white">
+      <header
+        className="flex items-center justify-center border-b border-gray-300 py-4 bg-green-600"
       >
-        <img 
-          className="w-48 h-12 object-center" 
-          src="/Images/logo.png" 
+        <img
+          className="w-48 h-12 object-contain"
+          src="/Images/logo.png"
           alt="Logo"
         />
       </header>
@@ -124,32 +133,36 @@ const Home = ({ route }) => {
         <div className="grid grid-cols-2 gap-4 w-full max-w-4xl">
           <BoxButton
             func={onPressGoToAnalysisScreen}
-            title={language('online_sperm_analyze')}
+            title={language("online_sperm_analyze")}
             img="/Images/sperm_analysis"
           />
           <BoxButton
-            func={() => route.history.push('/categories')}
-            title={language('centers_search')}
+            func={() => navigate("/categories")}
+            title={language("centers_search")}
             img="/Images/specia_list"
           />
           <BoxButton
-            func={() => route.history.push('/videoTraining')}
-            title={language('video_training')}
+            func={() => navigate("/videoTraining")}
+            title={language("video_training")}
             img="/Images/videoSuccess"
           />
           <BoxButton
-            func={() => route.history.push('/textTraining')}
-            title={language('text_training')}
+            func={() => navigate("/textTraining")}
+            title={language("text_training")}
             img="/Images/text_education"
           />
           <BoxButton
             func={onPressGoToHistoryScreen}
-            title={language('history')}
+            title={language("history")}
             img="/Images/analytsis_history"
           />
           <BoxButton
-            func={() => window.alert('این صفحه فعلا آماده نیست\nبرای جزئیات بیشتر با پشتیبانی تماس بگیرید')}
-            title={language('training_of_medical_staff')}
+            func={() =>
+              toast.warn(
+                "این صفحه فعلا آماده نیست\nبرای جزئیات بیشتر با پشتیبانی تماس بگیرید"
+              )
+            }
+            title={language("training_of_medical_staff")}
             img="/Images/health_education"
           />
         </div>
@@ -161,8 +174,8 @@ const Home = ({ route }) => {
 
       <SimpleModal
         isVisible={isResultReadyModal}
-        img={'/Images/ic_analysis'}
-        title={'آنالیز'}
+        img="/Images/ic_analysis"
+        title="آنالیز"
         isReady={true}
         description={descriptionModal}
         right_func={onPressGoToHistoryScreen}
@@ -171,6 +184,6 @@ const Home = ({ route }) => {
       <LoadingModal isVisible={isLoading} />
     </div>
   );
-};
+}
 
 export default Home;

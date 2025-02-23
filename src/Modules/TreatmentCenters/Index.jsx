@@ -1,245 +1,253 @@
-import React, { Component } from 'react';
-import { View, Text, Image, Button, FlatList, BackHandler } from 'react-native';
-import Geolocation from '@react-native-community/geolocation';
-import RNSettings from 'react-native-settings';
-import { orderByDistance } from 'geolib';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing potential alerts
+import { orderByDistance } from "geolib";
 
-import { ic_location, ic_arrow, ic_phone } from '../../Components/Images/Images';
-import SimpleModal from '../../Components/CustomModal/SimpleModal/SimpleModal';
-import CustomText from '../../Components/CustomText/CustomText';
-import FilterModal from './Componets/FilterModal/FilterModal';
-import SearchModal from './Componets/SearchModal/SearchModal';
-import Loading from '../../Components/Loading/Loading';
-import Header from './Componets/Header/Header';
-import language from '../../Assets/i18n/i18n';
-import Storage from '../../Factories/Storage';
+import { ic_location, ic_arrow, ic_phone } from "../../Components/Images/Images";
+import SimpleModal from "../../Components/CustomModal/SimpleModal/SimpleModal";
+import CustomText from "../../Components/CustomText/CustomText";
+import FilterModal from "./Componets/FilterModal/FilterModal"; // Assuming 'Componets' typo is intentional
+import SearchModal from "./Componets/SearchModal/SearchModal";
+import Loading from "../../Components/Loading/Loading";
+import Header from "./Componets/Header/Header";
+import language from "../../Assets/i18n/i18n";
+import storage from "../../Factories/Storage"; // Import functional storage
 
-let storage = new Storage();
+function TreatmentCenters() {
+    const navigate = useNavigate();
+    const { id } = useParams(); // Replacing props.match.params.id
+    const [isAccessLocation, setIsAccessLocation] = useState(false);
+    const [isVisibleFilter, setIsVisibleFilter] = useState(false);
+    const [isResultSearch, setIsResultSearch] = useState(false);
+    const [isFirstFilter, setIsFirstFilter] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchData, setSearchData] = useState([]);
+    const [data, setData] = useState([]);
+    const [arrayholder, setArrayholder] = useState([]); // Moved from class property to state
 
-class TreatmentCenters extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            id: props.match.params.id,
-            isAccessLocation: false,
-            isVisibleFilter: false,
-            isResultSearch: false,
-            isFirstFilter: false,
-            isLoading: false,
-            searchData: [],
-            data: []
+    useEffect(() => {
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            storage.remove("Select_Centers_Nearby");
+            navigate("/categories");
+            return true;
         };
-        this.arrayholder = [];
-    }
+        window.addEventListener("popstate", handleBack);
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.getCenters();
-    }
+        // Fetch centers
+        getCenters();
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
 
-    handleBackButtonClick = () => {
-        storage.remove("Select_Centers_Nearby");
-        this.props.history.push('/categories');
-        return true;
-    }
-
-    getCenters() {
-        this.setState({ isLoading: true });
-        storage.get("Select_Centers_Nearby", nearby => {
-            const nearbyData = JSON.parse(nearby);
+    const getCenters = () => {
+        setIsLoading(true);
+        storage.get("Select_Centers_Nearby", (nearby) => {
+            const nearbyData = nearby ? JSON.parse(nearby) : null;
             if (nearbyData) {
-                this.setState({
-                    data: nearbyData,
-                    isLoading: false
-                });
+                setData(nearbyData);
+                setIsLoading(false);
             } else {
-                storage.get("Select_Centers", data => {
-                    const res = JSON.parse(data);
-                    this.setState({
-                        data: res,
-                        isLoading: false
-                    });
-                    this.arrayholder = res;
+                storage.get("Select_Centers", (data) => {
+                    const res = data ? JSON.parse(data) : [];
+                    setData(res);
+                    setArrayholder(res); // Initialize arrayholder
+                    setIsLoading(false);
                 });
             }
         });
-    }
+    };
 
-    searchData(text) {
+    const searchDataFnc = (text) => {
         if (text.length > 1) {
-            this.setState({ isResultSearch: true });
-            const newData = this.arrayholder.filter(item => {
-                const itemData = item.title.toUpperCase() + item.address.toUpperCase();
+            setIsResultSearch(true);
+            const newData = arrayholder.filter((item) => {
+                const itemData = `${item.title.toUpperCase()} ${item.address.toUpperCase()}`;
                 const textData = text.toUpperCase();
-                return itemData.indexOf(textData) > -1
+                return itemData.indexOf(textData) > -1;
             });
-            this.setState({ searchData: newData });
+            setSearchData(newData);
         } else {
-            this.setState({ isResultSearch: false });
+            setIsResultSearch(false);
         }
-    }
+    };
 
-    onPressItem = (item) => {
-        const paramas = JSON.stringify(item);
-        this.props.history.push(`/clinicDetails/${paramas}`);
-    }
+    const onPressItem = (item) => {
+        const params = JSON.stringify(item);
+        navigate(`/clinicDetails/${params}`);
+    };
 
-    onPressIsVisibleFilter = () => {
-        this.setState({ isVisibleFilter: !this.state.isVisibleFilter });
-    }
+    const onPressIsVisibleFilter = () => {
+        setIsVisibleFilter(!isVisibleFilter);
+    };
 
-    onPressFilterData = () => {
-        RNSettings.getSetting(RNSettings.LOCATION_SETTING).then(result => {
-            if (result == RNSettings.ENABLED) {
-                Geolocation.getCurrentPosition(info => {
-                    this.filterData(info);
-                });
-            } else {
-                this.setState({ isAccessLocation: true });
-            }
-        });
-    }
+    const onPressFilterData = () => {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    filterData(position);
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    setIsAccessLocation(true); // Show modal if location access denied
+                }
+            );
+        } else {
+            toast.error("Geolocation is not supported in your browser.");
+            setIsVisibleFilter(false);
+        }
+    };
 
-    filterData(info) {
-        storage.get("Select_Centers_Nearby", data => {
-            const neardy = JSON.parse(data);
-            if (!neardy) {
-                if (this.state.data[0].category === "ivf") {
-                    var filter = [];
-                    const _data = this.state.data;
-                    _data.forEach(item => {
-                        const model = {
-                            latitude: item.loc_latitude,
-                            longitude: item.loc_longitude,
-                            active_times: item.active_times,
-                            address: item.address,
-                            category: item.category,
-                            city: item.city,
-                            description: item.description,
-                            email: item.email,
-                            id: item.id,
-                            logo_image: item.logo_image,
-                            map_image: item.map_image,
-                            phone: item.phone,
-                            short_name: item.short_name,
-                            title: item.title,
-                        };
-                        filter.push(model);
-                    });
-                    var findNearest = orderByDistance({ latitude: info.coords.latitude, longitude: info.coords.longitude }, filter);
-                    this.setState({
-                        data: findNearest,
-                        isVisibleFilter: false,
-                        isFirstFilter: true
-                    });
+    const filterData = (position) => {
+        storage.get("Select_Centers_Nearby", (data) => {
+            const nearby = data ? JSON.parse(data) : null;
+            if (!nearby) {
+                if (data[0]?.category === "ivf") {
+                    const filter = data.map((item) => ({
+                        latitude: item.loc_latitude,
+                        longitude: item.loc_longitude,
+                        active_times: item.active_times,
+                        address: item.address,
+                        category: item.category,
+                        city: item.city,
+                        description: item.description,
+                        email: item.email,
+                        id: item.id,
+                        logo_image: item.logo_image,
+                        map_image: item.map_image,
+                        phone: item.phone,
+                        short_name: item.short_name,
+                        title: item.title,
+                    }));
+                    const findNearest = orderByDistance(
+                        {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        },
+                        filter
+                    );
+                    setData(findNearest);
+                    setIsVisibleFilter(false);
+                    setIsFirstFilter(true);
                     storage.set("Select_Centers_Nearby", JSON.stringify(findNearest));
                 } else {
-                    this.setState({ isVisibleFilter: false });
+                    setIsVisibleFilter(false);
                 }
             } else {
-                this.setState({ isVisibleFilter: false });
+                setIsVisibleFilter(false);
             }
         });
-    }
+    };
 
-    onPressOpenSettingGps = () => {
-        RNSettings.openSetting(RNSettings.ACTION_LOCATION_SOURCE_SETTINGS).then(
-            result => {
-                if (result === RNSettings.ENABLED) {
-                    this.setState({ isAccessLocation: false });
-                    console.log('location is enabled');
-                } else {
-                    this.setState({ isAccessLocation: true });
-                    console.log('location is disable');
-                }
-            },
-        );
-    }
+    const onPressOpenSettingGps = () => {
+        // Web doesn't have a direct equivalent to open GPS settings; prompt user to enable manually
+        toast.info("لطفاً دسترسی به موقعیت مکانی را در تنظیمات مرورگر فعال کنید.");
+        setIsAccessLocation(false); // Close modal; user must enable manually
+    };
 
-    render() {
-        return (
-            <View className="flex-1">
-                <Header
-                    func_back={this.handleBackButtonClick}
-                    func_filter={this.onPressIsVisibleFilter}
-                    event={(value) => this.searchData(value)}
-                />
-                {!this.state.isLoading ? (
-                    <View className="flex-1">
-                        {!this.state.isResultSearch ? (
-                            <FlatList
-                                data={this.state.data}
-                                keyExtractor={(item) => item.id}
-                                ListEmptyComponent={<CustomText className="text-center text-black mt-[25%] text-sm">مراکز درمانی یافت نشد</CustomText>}
-                                renderItem={({ item, index }) => (
-                                    <View
+    const handleBackButtonClick = () => {
+        storage.remove("Select_Centers_Nearby");
+        navigate("/categories");
+    };
+
+    return (
+        <div className="flex flex-col min-h-screen">
+            <Header
+                func_back={handleBackButtonClick}
+                func_filter={onPressIsVisibleFilter}
+                event={(value) => searchDataFnc(value)}
+            />
+            {!isLoading ? (
+                <div className="flex-1">
+                    {!isResultSearch ? (
+                        <div className="flex flex-col items-center">
+                            {data.length === 0 ? (
+                                <CustomText className="text-center text-black mt-[25%] text-sm">
+                                    مراکز درمانی یافت نشد
+                                </CustomText>
+                            ) : (
+                                data.map((item, index) => (
+                                    <div
                                         key={item.id}
-                                        className={`w-[95%] h-[150px] bg-white rounded-md mt-2 flex-col items-center justify-between mb-${index + 1 === this.state.data.length ? '10' : '0'} shadow-md`}
+                                        className={`w-[95%] h-[150px] bg-white rounded-md mt-2 flex flex-col items-center justify-between ${index + 1 === data.length ? "mb-10" : "mb-0"
+                                            } shadow-md`}
                                     >
-                                        <View className="flex-3 justify-center">
-                                            <CustomText className="font-bold text-center text-lg text-dark">{item.title}</CustomText>
-                                        </View>
-                                        <View className="flex-3.5 flex-row">
-                                            <View className="flex-1 items-center justify-center">
-                                                <Image className="w-5 h-5 tint-green" source={ic_location} />
-                                            </View>
-                                            <View className="flex-9 justify-center">
-                                                <CustomText className="text-sm text-dark text-left w-[95%]" numberOfLines={1}>
+                                        <div className="flex-3 flex justify-center">
+                                            <CustomText className="font-bold text-center text-lg text-gray-800">
+                                                {item.title}
+                                            </CustomText>
+                                        </div>
+                                        <div className="flex-3.5 flex flex-row">
+                                            <div className="flex-1 flex items-center justify-center">
+                                                <img
+                                                    className="w-5 h-5"
+                                                    src={ic_location}
+                                                    alt="Location"
+                                                />
+                                            </div>
+                                            <div className="flex-[9] flex justify-center">
+                                                <CustomText
+                                                    className="text-sm text-gray-800 text-left w-[95%]"
+                                                    numberOfLines={1}
+                                                >
                                                     {item.address}
                                                 </CustomText>
-                                            </View>
-                                        </View>
-                                        <View className="flex-3.5 flex-row">
-                                            <View className="flex-1 items-center justify-center">
-                                                <Image className="w-5 h-5 tint-green" source={ic_phone} />
-                                            </View>
-                                            <View className="flex-4 items-start justify-center">
-                                                <CustomText className="text-sm text-dark" numberOfLines={1}>
+                                            </div>
+                                        </div>
+                                        <div className="flex-3.5 flex flex-row">
+                                            <div className="flex-1 flex items-center justify-center">
+                                                <img className="w-5 h-5" src={ic_phone} alt="Phone" />
+                                            </div>
+                                            <div className="flex-[4] flex items-start justify-center">
+                                                <CustomText
+                                                    className="text-sm text-gray-800"
+                                                    numberOfLines={1}
+                                                >
                                                     {item.phone}
                                                 </CustomText>
-                                            </View>
-                                            <View className="flex-4.5 items-end justify-center pr-2">
-                                                <Button
-                                                    className="w-[70%] h-[70%] rounded-full bg-white border-1 border-green items-center justify-center"
-                                                    onPress={() => this.onPressItem(item)}
-                                                    title={`${language('more_details')}  `}
-                                                    icon={<Image className="w-2.5 h-2.5 mt-2" source={ic_arrow} />}
-                                                />
-                                            </View>
-                                        </View>
-                                    </View>
-                                )}
-                            />
-                        ) : (
-                            <SearchModal
-                                data={this.state.searchData}
-                                route={this.props}
-                            />
-                        )}
-                    </View>
-                ) : (
-                    <Loading />
-                )}
-                <FilterModal
-                    isVisible={this.state.isVisibleFilter}
-                    onPressCloseModal={this.onPressIsVisibleFilter}
-                    onPressFilter={this.onPressFilterData}
-                />
-                <SimpleModal
-                    isVisible={this.state.isAccessLocation}
-                    img={ic_location}
-                    title="دسترسی به موقعیت مکانی"
-                    description="لطفا جهت سهولت بیشتر , اجازه دسترسی به موقعیت مکانی را صادر نمایید."
-                    right_func={this.onPressOpenSettingGps}
-                    left_func={() => this.setState({ isAccessLocation: false })}
-                />
-            </View>
-        );
-    }
+                                            </div>
+                                            <div className="flex-[4.5] flex items-end justify-center pr-2">
+                                                <button
+                                                    className="w-[70%] h-[70%] rounded-full bg-white border border-green-500 flex items-center justify-center"
+                                                    onClick={() => onPressItem(item)}
+                                                >
+                                                    <CustomText className="text-green-500 text-sm">
+                                                        {language("more_details")}
+                                                    </CustomText>
+                                                    <img
+                                                        className="w-2.5 h-2.5 ml-1"
+                                                        src={ic_arrow}
+                                                        alt="Arrow"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    ) : (
+                        <SearchModal data={searchData} route={{ navigate }} />
+                    )}
+                </div>
+            ) : (
+                <Loading />
+            )}
+            <FilterModal
+                isVisible={isVisibleFilter}
+                onPressCloseModal={onPressIsVisibleFilter}
+                onPressFilter={onPressFilterData}
+            />
+            <SimpleModal
+                isVisible={isAccessLocation}
+                img={ic_location}
+                title="دسترسی به موقعیت مکانی"
+                description="لطفا جهت سهولت بیشتر، اجازه دسترسی به موقعیت مکانی را صادر نمایید."
+                right_func={onPressOpenSettingGps}
+                left_func={() => setIsAccessLocation(false)}
+            />
+        </div>
+    );
 }
 
 export default TreatmentCenters;

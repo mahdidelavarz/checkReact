@@ -1,105 +1,92 @@
-import React, { Component } from 'react';
-import { StatusBar } from 'react-native';
-import Toast from 'react-native-simple-toast';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing props.route.history
+import { toast } from "react-toastify"; // Replacing Toast
 
-import AnonymousUser from './Components/AnonymousUser/AnonymousUser';
-import FamiliarUser from './Components/FamiliarUser/FamiliarUser';
-import { statusHandle } from '../../../Factories/HttpHandler';
-import Loading from '../../../Components/Loading/Loading';
-import { findMessages } from '../../../Filters/Filters';
-import colors from '../../../Assets/Styles/Colors';
-import Storage from '../../../Factories/Storage';
-import Header from './Components/Header/Header';
-import { Url } from '../../../Configs/Urls';
+import AnonymousUser from "./Components/AnonymousUser/AnonymousUser";
+import FamiliarUser from "./Components/FamiliarUser/FamiliarUser";
+import { statusHandle } from "../../../Factories/HttpHandler";
+import Loading from "../../../Components/Loading/Loading";
+import { findMessages } from "../../../Filters/Filters";
+import storage from "../../../Factories/Storage";
+import Header from "./Components/Header/Header";
+import { Url } from "../../../Configs/Urls";
 
-let storage = new Storage();
+function Profile() {
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [token, setToken] = useState("");
+    const [email, setEmail] = useState("");
 
-class Profile extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isLoading: false,
-            token: '',
-            email: ''
-        };
-    }
-
-    componentDidMount() {
-        this.setState({ isLoading: true });
-        storage.get("Token", token => {
-            this.setState({ token });
-            this.getData(token);
+    useEffect(() => {
+        setIsLoading(true);
+        storage.get("Token", (token) => {
+            setToken(token);
+            getData(token);
         });
-    }
+    }, []);
 
-    getData(token) {
-        storage.get("Profile", data => {
-            const res = JSON.parse(data);
-            if (data) {
-                this.setState({
-                    email: res.email,
-                    isLoading: false
-                });
+    const getData = (token) => {
+        storage.get("Profile", (data) => {
+            const res = data ? JSON.parse(data) : null;
+            if (res) {
+                setEmail(res.email || "");
+                setIsLoading(false);
                 console.log("full");
             } else {
-                this.getDataFromServer(token);
+                getDataFromServer(token);
                 console.log("empty");
             }
         });
-    }
+    };
 
-    async getDataFromServer(token) {
+    const getDataFromServer = async (token) => {
         try {
             const response = await fetch(`${Url.serverUrl}Auth/profile/`, {
-                method: 'GET',
+                method: "GET",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'token ' + token
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `token ${token}`,
                 },
             });
 
-            statusHandle(response.status, this.props.route.history);
+            statusHandle(response.status, navigate); 
             const responseJson = await response.json();
 
             if (responseJson.detail === "err_user_anonymous") {
-                findMessages(responseJson.detail, message => {
-                    Toast.show(message);
+                findMessages(responseJson.detail, (message) => {
+                    toast.info(message); // Replacing Toast.show
                 });
             } else {
-                storage.set("Profile", JSON.stringify(responseJson));
-                this.setState({
-                    email: responseJson.email
-                });
+                storage.set("Profile", JSON.stringify(responseJson)); 
+                setEmail(responseJson.email || "");
             }
 
-            this.setState({ isLoading: false });
+            setIsLoading(false);
         } catch (error) {
-            this.setState({ isLoading: false });
-            Toast.show(`${error.message}`);
+            setIsLoading(false);
+            toast.error(`${error.message}`); // Replacing Toast.show
         }
-    }
+    };
 
-    render() {
-        if (!this.state.isLoading) {
-            return (
-                <div className="flex flex-col h-screen bg-white">
-                    <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
-                    <div className="flex-2">
-                        <Header userName={this.state.email} />
-                    </div>
-                    <div className="flex-8">
-                        {!this.state.email ? (
-                            <AnonymousUser param={this.props} />
-                        ) : (
-                            <FamiliarUser param={this.props} />
-                        )}
-                    </div>
+    if (!isLoading) {
+        return (
+            <div className="flex flex-col h-screen bg-white">
+                {/* StatusBar not needed in web */}
+                <div className="flex-2">
+                    <Header userName={email} />
                 </div>
-            );
-        } else {
-            return <Loading />;
-        }
+                <div className="flex-8">
+                    {!email ? (
+                        <AnonymousUser param={{ navigate }} />
+                    ) : (
+                        <FamiliarUser param={{ navigate }} />
+                    )}
+                </div>
+            </div>
+        );
+    } else {
+        return <Loading />;
     }
 }
 

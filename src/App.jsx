@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { I18nextProvider } from 'react-i18next';
-import i18next from './assets/i18n/i18n'; // Adjust path
+import i18next from './Assets/i18n/i18n'; // Adjust path
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import './App.css'
 
 import Splash from './Modules/Splash/Index';
@@ -61,6 +63,7 @@ function App() {
 
   return (
     <I18nextProvider i18n={i18next}>
+      <ToastContainer />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />

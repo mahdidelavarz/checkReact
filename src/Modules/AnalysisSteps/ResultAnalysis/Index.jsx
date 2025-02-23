@@ -1,123 +1,153 @@
-import React, { Component } from 'react';
-import { Linking, BackHandler } from 'react-native';
-import DropdownAlert from 'react-native-dropdownalert';
-import Toast from 'react-native-simple-toast';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing DropdownAlert and Toast
 
-import HelpHeader from '../../../Components/Analysis/HelpHeader/HelpHeader';
-import CloseModal from '../../../Components/Analysis/CloseModal/CloseModal';
-import HelpModal from '../../../Components/Analysis/HelpModal/HelpModal';
-import SimpleButton from '../../../Components/CustomButton/SimpleButton';
-import CustomText from '../../../Components/CustomText/CustomText';
-import Footer from '../../../Components/Analysis/Footer/Footer';
-import { statusHandle } from '../../../Factories/HttpHandler';
-import GadgetList from './Components/GadgetList/GadgetList';
-import Loading from '../../../Components/Loading/Loading';
-import EmptyList from './Components/EmptyList/EmptyList';
-import { Url } from '../../../Configs/Urls';
-import colors from '../../../Assets/Styles/Colors';
-import languages from '../../../Assets/i18n/i18n';
-import Storage from '../../../Factories/Storage';
+import HelpHeader from "../../../Components/Analysis/HelpHeader/HelpHeader";
+import CloseModal from "../../../Components/Analysis/CloseModal/CloseModal";
+import HelpModal from "../../../Components/Analysis/HelpModal/HelpModal";
+import SimpleButton from "../../../Components/CustomButton/SimpleButton";
+import CustomText from "../../../Components/CustomText/CustomText";
+import Footer from "../../../Components/Analysis/Footer/Footer";
+import { statusHandle } from "../../../Factories/HttpHandler";
+import GadgetList from "./Components/GadgetList/GadgetList";
+import Loading from "../../../Components/Loading/Loading";
+import EmptyList from "./Components/EmptyList/EmptyList";
+import { Url } from "../../../Configs/Urls";
+import languages from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage"; // Import functional storage
 
 let Token;
-let storage = new Storage();
-class SecondStep extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            data: [],
-            isLoading: false,
-            isHelpModal: false,
-            isCloseModal: false,
-            selected: -1
+
+function SecondStep() {
+    const navigate = useNavigate();
+    const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isHelpModal, setIsHelpModal] = useState(false);
+    const [isCloseModal, setIsCloseModal] = useState(false);
+    const [selected, setSelected] = useState(-1);
+
+    useEffect(() => {
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            setIsCloseModal(true);
+            return true;
         };
-    }
+        window.addEventListener("popstate", handleBack);
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.setState({ isLoading: true });
-        storage.get("Token", data => {
-            Token = data;
-            this.getGadgetList();
+        // Fetch token and gadget list
+        setIsLoading(true);
+        storage.get("Token", (token) => {
+            Token = token;
+            getGadgetList();
         });
-    }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
 
-    handleBackButtonClick = () => {
-        this.setState({ isCloseModal: true })
-        return true;
-    }
-
-    async getGadgetList() {
+    const getGadgetList = async () => {
         try {
             const response = await fetch(`${Url.serverUrl}Analysis/gadgets/`, {
-                method: 'GET',
+                method: "GET",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'token ' + Token
-                }
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `token ${Token}`,
+                },
             });
-            statusHandle(response.status, this.props.history);
+            statusHandle(response.status, navigate); // Updated to use navigate
             const responseJson = await response.json();
-            this.setState({
-                isLoading: false,
-                data: responseJson
-            });
+            setData(responseJson);
+            setIsLoading(false);
         } catch (error) {
-            this.setState({ isLoading: false });
-            Toast.show(`${error.message}`);
+            setIsLoading(false);
+            toast.error(`${error.message}`); // Replacing Toast.show
         }
-    }
+    };
 
-    onPressNextStep = () => {
-        if (this.state.data.length === 0) {
-            this.dropDownAlert.alertWithType('warn', languages('empty_gadget_alert'));
-        } else if (this.state.selected === -1) {
-            this.dropDownAlert.alertWithType('warn', 'لطفا یکی از گجت ها را انتخاب کنید');
+    const onPressNextStep = () => {
+        if (data.length === 0) {
+            toast.warn(languages("empty_gadget_alert")); // Replacing DropdownAlert
+        } else if (selected === -1) {
+            toast.warn("لطفا یکی از گجت ها را انتخاب کنید");
         } else {
-            this.props.history.push('/thirdStep');
-            storage.remove("Title");
+            navigate("/thirdStep");
+            storage.remove("Title"); // Updated to functional storage
         }
-    }
+    };
 
-    render() {
-        return (
-            <div className="flex flex-col min-h-screen bg-white">
-                <DropdownAlert ref={ref => this.dropDownAlert = ref} inactiveStatusBarBackgroundColor={colors.dark_green} titleStyle={{ fontFamily: 'iranyekanwebbold(fanum)', fontSize: 12, color: colors.white }} />
-                <HelpHeader closeFunc={() => this.setState({ isCloseModal: true })} helpFunc={() => this.setState({ isHelpModal: true })} count={2} />
-                {!this.state.isLoading ? (
-                    <div className="flex flex-col flex-1">
-                        <div className="flex flex-col items-center justify-evenly flex-3">
-                            <CustomText className="text-center text-lg text-gray-800">{languages('select_gadget')}</CustomText>
-                            <CustomText className="text-center text-sm text-gray-500 w-11/12">{languages('attach_gadget_description')}</CustomText>
-                        </div>
-                        <div className="flex-4">
-                            {this.state.data.length !== 0 ? (
-                                <GadgetList data={this.state.data} func={(index) => this.setState({ selected: index })} />
-                            ) : (
-                                <EmptyList />
-                            )}
-                        </div>
-                        <div className="flex flex-col items-center justify-center flex-2 w-4/5 mx-auto">
-                            <div className="flex flex-row w-full space-x-2">
-                                <SimpleButton func={() => Linking.openURL('https://etcco.ir')} btnStyle="flex-1" title={languages('buy_gadget')} titleStyle="text-sm" />
-                                <SimpleButton func={() => this.props.history.push('/addGadget')} btnStyle="flex-1 ml-2" title={languages('add_gadget')} titleStyle="text-sm" />
-                            </div>
-                        </div>
-                        <div className="flex-1 flex justify-center">
-                            <Footer nextFunc={this.onPressNextStep} screenCount={2} line={'15%'} backFunc={() => this.setState({ isCloseModal: true })} />
+    const handleBackButtonClick = () => {
+        setIsCloseModal(true);
+    };
+
+    const onPressCloseAnalysis = () => {
+        setIsCloseModal(false);
+        navigate("/tabBar"); // Assuming this is the intended close destination
+    };
+
+    return (
+        <div className="flex flex-col min-h-screen bg-white">
+            <HelpHeader
+                closeFunc={handleBackButtonClick}
+                helpFunc={() => setIsHelpModal(true)}
+                count={2}
+            />
+            {!isLoading ? (
+                <div className="flex flex-col flex-1">
+                    <div className="flex flex-col items-center justify-evenly flex-3">
+                        <CustomText className="text-center text-lg text-gray-800">
+                            {languages("select_gadget")}
+                        </CustomText>
+                        <CustomText className="text-center text-sm text-gray-500 w-11/12">
+                            {languages("attach_gadget_description")}
+                        </CustomText>
+                    </div>
+                    <div className="flex-4">
+                        {data.length !== 0 ? (
+                            <GadgetList data={data} func={(index) => setSelected(index)} />
+                        ) : (
+                            <EmptyList />
+                        )}
+                    </div>
+                    <div className="flex flex-col items-center justify-center flex-2 w-4/5 mx-auto">
+                        <div className="flex flex-row w-full space-x-2">
+                            <SimpleButton
+                                func={() => window.open("https://etcco.ir", "_blank")} // Replacing Linking.openURL
+                                btnStyle="flex-1"
+                                title={languages("buy_gadget")}
+                                titleStyle="text-sm"
+                            />
+                            <SimpleButton
+                                func={() => navigate("/addGadget")}
+                                btnStyle="flex-1 ml-2"
+                                title={languages("add_gadget")}
+                                titleStyle="text-sm"
+                            />
                         </div>
                     </div>
-                ) : (
-                    <Loading />
-                )}
-                <CloseModal visible={this.state.isCloseModal} closeFunc={this.onPressCloseAnalysis} resumeFunc={() => this.setState({ isCloseModal: false })} />
-                <HelpModal visible={this.state.isHelpModal} description={languages('help_modal_txt_step_2')} closeFunc={() => this.setState({ isHelpModal: false })} />
-            </div>
-        );
-    }
-};
+                    <div className="flex-1 flex justify-center">
+                        <Footer
+                            nextFunc={onPressNextStep}
+                            screenCount={2}
+                            line="15%"
+                            backFunc={handleBackButtonClick}
+                        />
+                    </div>
+                </div>
+            ) : (
+                <Loading />
+            )}
+            <CloseModal
+                visible={isCloseModal}
+                closeFunc={onPressCloseAnalysis}
+                resumeFunc={() => setIsCloseModal(false)}
+            />
+            <HelpModal
+                visible={isHelpModal}
+                description={languages("help_modal_txt_step_2")}
+                closeFunc={() => setIsHelpModal(false)}
+            />
+        </div>
+    );
+}
+
 export default SecondStep;

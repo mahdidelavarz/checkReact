@@ -1,155 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { ImageBackground, StatusBar, BackHandler, I18nManager } from 'react-native';
-import DropdownAlert from 'react-native-dropdownalert';
-import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-simple-toast';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing Toast and DropdownAlert
 
-import LoadingModal from '../../../Components/CustomModal/LoadingModal/LoadingModal';
-import { auto_back, auto_back_rtl } from '../../../Components/Images/Images';
-import SimpleButton from '../../../Components/CustomButton/SimpleButton';
-import CustomInput from '../../../Components/CustomInput/CustomInput';
-import CustomText from '../../../Components/CustomText/CustomText';
-import { findMessages } from '../../../Filters/Filters';
-import colors from '../../../Assets/Styles/Colors';
-import language from '../../../Assets/i18n/i18n';
-import Storage from '../../../Factories/Storage';
-import { Url } from '../../../Configs/Urls';
+import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
+import { auto_back, auto_back_rtl } from "../../../Components/Images/Images";
+import SimpleButton from "../../../Components/CustomButton/SimpleButton";
+import CustomInput from "../../../Components/CustomInput/CustomInput";
+import CustomText from "../../../Components/CustomText/CustomText";
+import { findMessages } from "../../../Filters/Filters";
+import colors from "../../../Assets/Styles/Colors";
+import language from "../../../assets/i18n/i18n";
+import { Url } from "../../../Configs/Urls";
 
-class NewPassword extends React.Component {
-    constructor(props) {
-        super(props);
-        this.focusNextField = this.focusNextField.bind(this);
-        this.dropDownAlert = null;
-        this.inputs = {};
-        this.state = {
-            back: auto_back_rtl,
-            isLoading: false,
-            confirm_password: '',
-            new_password: '',
-            email: ''
-        };
+function NewPassword() {
+  const navigate = useNavigate();
+  const [back, setBack] = useState(auto_back_rtl);
+  const [isLoading, setIsLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const inputs = useRef({}); // Replacing this.inputs for focusing
+
+  useEffect(() => {
+    // Check document direction instead of I18nManager.isRTL
+    if (document.dir !== "rtl") {
+      setBack(auto_back);
     }
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        if (!I18nManager.isRTL) {
-            this.setState({ back: auto_back });
-        }
-    }
+    // Replacing BackHandler with browser back navigation
+    const handleBack = () => {
+      navigate(-1);
+      return true;
+    };
+    window.addEventListener("popstate", handleBack);
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+    return () => window.removeEventListener("popstate", handleBack);
+  }, [navigate]);
 
-    handleBackButtonClick = () => {
-        this.props.history.goBack();
-        return true;
+  const focusNextField = (id) => {
+    if (inputs.current[id]) {
+      inputs.current[id].focus();
     }
+  };
 
-    focusNextField(id) {
-        this.inputs[id].focus();
+  const onPressChangePassword = () => {
+    // Replacing NetInfo with navigator.onLine
+    if (navigator.onLine) {
+      if (!email) {
+        toast.warn("لطفا ایمیل را وارد کنید"); // Replacing DropdownAlert
+      } else if (!confirmPassword) {
+        toast.warn("لطفا کد ارسالی به ایمیل را وارد کنید");
+      } else if (!newPassword) {
+        toast.warn("لطفا رمز جدید را وارد کنید");
+      } else if (newPassword.length < 8) {
+        toast.warn("گذرواژه حداقل باید 8 عدد یا حروف باشد");
+      } else {
+        changePassword(email, confirmPassword, newPassword);
+      }
+    } else {
+      toast.error("عدم دسترسی به اینترنت. لطفا اتصال به اینترنت را چک کنید.");
     }
+  };
 
-    onPressChangePassword = () => {
-        const { email, confirm_password, new_password } = this.state;
-        NetInfo.fetch().then(state => {
-            if (state.isConnected) {
-                if (!email) {
-                    this.dropDownAlert.alertWithType('warn', 'لطفا ایمیل را وارد کنید');
-                } else if (!confirm_password) {
-                    this.dropDownAlert.alertWithType('warn', 'لطفا کد ارسالی  به ایمیل را وارد کنید');
-                } else if (!new_password) {
-                    this.dropDownAlert.alertWithType('warn', 'لطفا رمز جدید را وارد کنید');
-                } else if (new_password.length < 8) {
-                    this.dropDownAlert.alertWithType('warn', 'گذرواژه حداقل باید 8 عدد یا حروف باشد');
-                } else {
-                    this.changePassword(email, confirm_password, new_password);
-                }
-            } else {
-                Alert.alert("عدم دسترسی به اینترنت", "لطفا اتصال به اینترنت را چک کنید.",
-                    [{ text: "متوجه شدم" }], { cancelable: false });
-            }
-        });
+  const changePassword = async (email, confirm_password, new_password) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${Url.serverUrl}Auth/password/reset/confirm/`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.toLowerCase(),
+          confirm_code: confirm_password,
+          new_password,
+        }),
+      });
+      const responseJson = await response.json();
+      setIsLoading(false);
+      findMessages(responseJson.detail, (message) => {
+        toast.info(message); // Replacing Toast.show
+      });
+      if (responseJson.detail) {
+        navigate("/SignIn");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(`${error.message}`);
     }
+  };
 
-    async changePassword(email, confirm_password, new_password) {
-        this.setState({ isLoading: true });
-        try {
-            const response = await fetch(`${Url.serverUrl}Auth/password/reset/confirm/`, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "email": email.toLowerCase(),
-                    "confirm_code": confirm_password,
-                    "new_password": new_password
-                })
-            });
-            const responseJson = await response.json();
-            this.setState({ isLoading: false });
-            findMessages(responseJson.detail, message => {
-                Toast.show(message);
-            });
-            if (responseJson.detail) {
-                this.props.history.push("/SignIn");
-            }
-        } catch (error) {
-            this.setState({ isLoading: false });
-        }
-    }
+  return (
+    <div
+      className="flex-1 flex flex-col bg-cover bg-center"
+      style={{ backgroundImage: `url(${back})` }}
+    >
+      {/* DropdownAlert and StatusBar not needed in web */}
+      <div className="flex-2.5" />
+      <div className="flex-6 flex flex-col">
+        <div className="flex-1 flex justify-center">
+          <CustomText font_weight="bold" className="text-[16px] text-green-500 ml-[60px]">
+            تغییر رمز
+          </CustomText>
+        </div>
+        <div className="flex-9 flex items-center justify-center">
+          <div className="w-[70%]">
+            <CustomInput
+              placeholder={language("email")}
+              event={(value) => setEmail(value)}
+              keyboardType="email-address" // Adjust in CustomInput for web
+              autoCapitalize="none"
+              onSubmitEditing={() => focusNextField("confirm_password")}
+            />
+            <CustomInput
+              placeholder="کد دریافتی"
+              event={(value) => setConfirmPassword(value)}
+              keyboardType="default"
+              onRef={(ref) => (inputs.current["confirm_password"] = ref)}
+              onSubmitEditing={() => focusNextField("new_password")}
+              mode="password"
+            />
+            <CustomInput
+              placeholder="رمز جدید"
+              event={(value) => setNewPassword(value)}
+              keyboardType="default"
+              onRef={(ref) => (inputs.current["new_password"] = ref)}
+              onSubmitEditing={onPressChangePassword}
+              mode="password"
+            />
+            <SimpleButton
+              func={onPressChangePassword}
+              title="تغییر"
+              btnStyle="mt-[15px]"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex-1.5" />
+      <LoadingModal isVisible={isLoading} />
+    </div>
+  );
+}
 
-    render() {
-        return (
-            <ImageBackground className="flex-1 flex-col" source={this.state.back}>
-                <DropdownAlert
-                    ref={ref => this.dropDownAlert = ref}
-                    inactiveStatusBarBackgroundColor={colors.dark_green}
-                    titleStyle={{ fontFamily: 'iranyekanwebbold(fanum)', fontSize: 12, color: colors.white }}
-                />
-                <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
-                <div className="flex-2.5" />
-                <div className="flex-6 flex-col">
-                    <div className="flex-1 justify-center">
-                        <CustomText font_weight={'bold'} className="text-[16px] text-green-500 ml-[60px]">
-                            تغییر رمز
-                        </CustomText>
-                    </div>
-                    <div className="flex-9 items-center justify-center">
-                        <div className="w-[70%]">
-                            <CustomInput
-                                placeholder={language('email')}
-                                event={(value) => this.setState({ email: value })}
-                                keyboardType={'email-address'}
-                                autoCapitalize={'none'}
-                                onSubmitEditing={() => { this.focusNextField('confirm_password') }}
-                            />
-                            <CustomInput
-                                placeholder={'کد دریافتی'}
-                                event={(value) => this.setState({ confirm_password: value })}
-                                keyboardType={'default'}
-                                onRef={(ref) => { this.inputs['confirm_password'] = ref }}
-                                onSubmitEditing={() => { this.focusNextField('new_password') }}
-                                mode={'password'}
-                            />
-                            <CustomInput
-                                placeholder={'رمز جدید'}
-                                event={(value) => this.setState({ new_password: value })}
-                                keyboardType={'default'}
-                                onRef={(ref) => { this.inputs['new_password'] = ref }}
-                                onSubmitEditing={this.onPressChangePassword}
-                                mode={'password'}
-                            />
-                            <SimpleButton
-                                func={this.onPressChangePassword}
-                                title={'تغییر'}
-                                btnStyle="mt-[15px]"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-1.5" />
-                <LoadingModal isVisible={this.state.isLoading} />
-            </ImageBackground>
-        );
-    }
-};
 export default NewPassword;

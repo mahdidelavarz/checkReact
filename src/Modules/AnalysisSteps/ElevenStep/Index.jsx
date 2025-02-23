@@ -1,234 +1,213 @@
-import React, { Component } from 'react';
-import { PermissionsAndroid, BackHandler, Alert } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
-import RNFetchBlob from 'react-native-fetch-blob';
-import Storage from '../../../Factories/Storage';
-import Toast from 'react-native-simple-toast';
-import { RNCamera } from 'react-native-camera';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing Toast and Alert
 
-import LoadingRecord from '../../../Components/Analysis/LoadingRecord/LoadingRecord';
-import PendingView from '../../../Components/Analysis/PendingView/PendingView';
-import HelpHeader from '../../../Components/Analysis/HelpHeader/HelpHeader';
-import CloseModal from '../../../Components/Analysis/CloseModal/CloseModal';
-import FirstStepRecord from './Components/FirstStepRecord/FirstStepRecord';
-import ThreeStepRecord from './Components/ThreeStepRecord/ThreeStepRecord';
-import HelpModal from '../../../Components/Analysis/HelpModal/HelpModal';
-import TwoStepRecord from './Components/TwoStepRecord/TwoStepRecord';
-import { statusHandle } from '../../../Factories/HttpHandler';
-import { findMessages } from '../../../Filters/Filters';
-import languages from '../../../Assets/i18n/i18n';
-import { Url } from '../../../Configs/Urls';
+import LoadingRecord from "../../../Components/Analysis/LoadingRecord/LoadingRecord";
+// PendingView not used in this version; remove if not needed elsewhere
+import HelpHeader from "../../../Components/Analysis/HelpHeader/HelpHeader";
+import CloseModal from "../../../Components/Analysis/CloseModal/CloseModal";
+import FirstStepRecord from "./Components/FirstStepRecord/FirstStepRecord";
+import ThreeStepRecord from "./Components/ThreeStepRecord/ThreeStepRecord";
+import HelpModal from "../../../Components/Analysis/HelpModal/HelpModal";
+import TwoStepRecord from "./Components/TwoStepRecord/TwoStepRecord";
+import { statusHandle } from "../../../Factories/HttpHandler";
+import { findMessages } from "../../../Filters/Filters";
+import languages from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage"; // Import functional storage
+import { Url } from "../../../Configs/Urls";
 import Store from "../../../Store/Store";
 
 let Token;
-let storage = new Storage();
-class ElevenStep extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isLoading: false,
-            isHelpModal: false,
-            isCloseModal: false,
-            isStartRecordOne: false,
-            isEndRecordOne: false,
-            isStatusPhoto: false,
-            cameraZoom: 0,
-            videoUri: null
+
+function ElevenStep() {
+    const navigate = useNavigate();
+    const videoRef = useRef(null); // Reference for video element
+    const [isLoading, setIsLoading] = useState(false);
+    const [isHelpModal, setIsHelpModal] = useState(false);
+    const [isCloseModal, setIsCloseModal] = useState(false);
+    const [isStartRecordOne, setIsStartRecordOne] = useState(false);
+    const [isEndRecordOne, setIsEndRecordOne] = useState(false);
+    const [isStatusPhoto, setIsStatusPhoto] = useState(false);
+    const [videoBlob, setVideoBlob] = useState(null); // Store recorded video Blob
+    const [stream, setStream] = useState(null); // Camera stream
+
+    useEffect(() => {
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            setIsCloseModal(true);
+            return true;
         };
-        this.permissionCamera()
-    }
+        window.addEventListener("popstate", handleBack);
 
-    async permissionCamera() {
-        try {
-            const grantedCom = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CAMERA, {
-                'title': ' Camera Permission',
-                'message': 'Rubit needs access to your camera '
+        // Get token
+        storage.get("Token", (token) => (Token = token));
+
+        // Request camera access (web equivalent of permissionCamera)
+        async function setupCamera() {
+            try {
+                const mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false, // Mute, matching original mute: true
+                });
+                setStream(mediaStream);
+                if (videoRef.current) {
+                    videoRef.current.srcObject = mediaStream;
+                }
+            } catch (err) {
+                console.error("Camera access denied:", err);
+                toast.error("دسترسی به دوربین رد شد. لطفاً مجوز را فعال کنید.");
             }
-            );
-            if (grantedCom === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log("You can use the camera")
-            } else {
-                console.log("Camera permission denied")
-            }
-        } catch (err) {
-            console.warn(err)
         }
-    }
+        setupCamera();
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        this.permissionCamera();
-        storage.get("Token", token => Token = token);
-    }
+        return () => {
+            window.removeEventListener("popstate", handleBack);
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop()); // Cleanup stream
+            }
+        };
+    }, [navigate]);
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+    const startRecording = async () => {
+        if (!stream) {
+            toast.error("دوربین آماده نیست");
+            return;
+        }
+        setIsStartRecordOne(true);
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+        const chunks = [];
 
-    handleBackButtonClick = () => {
-        this.setState({ isCloseModal: true });
-        return true;
-    }
+        mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: "video/webm" });
+            setVideoBlob(blob);
+            takePicture(blob); // Simulate taking a picture from the video
+        };
 
-    async takePicture() {
-        this.setState({
-            isStartRecordOne: false,
-            isLoading: true,
-            isEndRecordOne: true,
-        });
-        try {
-            const options = { quality: 0.5 };
-            setTimeout(async () => {
-                const data = await this.camera.takePictureAsync(options);
-                this.uploadQcImage(data.uri);
-            }, 200);
-        } catch (e) {
-            alert(e)
+        mediaRecorder.start();
+        setTimeout(() => {
+            mediaRecorder.stop();
+        }, 6000); // Match original 6-second duration
+    };
+
+    const takePicture = (videoBlob) => {
+        setIsStartRecordOne(false);
+        setIsLoading(true);
+        setIsEndRecordOne(true);
+        uploadQcImage(videoBlob); // Use video blob as a proxy for image
+    };
+
+    const uploadQcImage = async (blob) => {
+        if (navigator.onLine) {
+            const formData = new FormData();
+            formData.append("index", JSON.stringify(2));
+            formData.append("image", blob, "video.webm"); // Sending video as blob; adjust if server expects image
+
+            try {
+                const response = await fetch(`${Url.serverUrl}Analysis/qc/`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `token ${Token}`,
+                    },
+                    body: formData,
+                });
+                statusHandle(response.status, navigate);
+                const responseJson = await response.json();
+                if (response.status === 200) {
+                    setIsStatusPhoto(true);
+                } else {
+                    toast.warn("اطلاعات ارسالی تایید نشد دوباره تلاش کنید");
+                    setIsStatusPhoto(false);
+                    setIsEndRecordOne(false);
+                }
+                setIsLoading(false);
+                findMessages(responseJson.detail, (message) => toast.info(message));
+            } catch (err) {
+                setIsLoading(false);
+                setIsStatusPhoto(false);
+                toast.error("خطا در ارسال اطلاعات: " + err.message);
+            }
+        } else {
+            toast.error("عدم دسترسی به اینترنت. لطفا اتصال به اینترنت خود را چک کنید");
+            setIsLoading(false);
         }
     };
 
-    uploadQcImage(uri) {
-        NetInfo.fetch().then(state => {
-            if (state.isConnected) {
-                RNFetchBlob.fetch('POST', `${Url.serverUrl}Analysis/qc/`, {
-                    Authorization: 'token ' + Token,
-                    'Content-Type': 'multipart/form-data',
-                }, [{
-                    name: "index",
-                    data: JSON.stringify(2)
-                },
-                {
-                    name: 'image',
-                    type: 'image/jpeg',
-                    filename: 'image.jpg',
-                    data: RNFetchBlob.wrap(uri)
-                }
-                ])
-                    .then((res) => {
-                        statusHandle(res.respInfo.status, this.props.history);
-                        if (res.respInfo.status == 200) {
-                            this.setState({ isStatusPhoto: true });
-                        } else {
-                            Toast.show('اطلاعات ارسالی تایید نشد دوباره تلاش کنید');
-                            this.setState({ isStatusPhoto: false, isEndRecordOne: false });
-                        }
-                        this.setState({ isLoading: false });
-                        const message = JSON.parse(res.data);
-                        findMessages(message.detail, message => {
-                            Toast.show(message);
-                        });
-                    })
-                    .catch((err) => {
-                        this.setState({ isLoading: false, isStatusPhoto: false });
-                    })
+    const onPressNextStep = (step) => {
+        if (step === 1) {
+            toast.info("ابتدا ویدیو ضبط نمایید");
+        } else if (step === 2) {
+            toast.info("چند لحظه صبر کنید");
+        } else if (step === 3) {
+            if (isStatusPhoto) {
+                storage.set("VideoRecord2", URL.createObjectURL(videoBlob)); // Store blob URL
+                if (stream) stream.getTracks().forEach((track) => track.stop()); // Stop camera
+                navigate("/twelveStep");
             } else {
-                Alert.alert('عدم دسترسی به اینترنت', 'لطفا اتصال به اینترنت خود را چک کنید')
-            }
-        });
-    }
-
-    async startRecording() {
-        try {
-            this.setState({
-                isStartRecordOne: true,
-            });
-            let { uri, codec = "mp4" } = await this.camera.recordAsync({
-                mute: true,
-                maxDuration: 6,
-                quality: RNCamera.Constants.VideoQuality["4:3"]
-            });
-            console.log('uri', uri);
-            this.setState({ videoUri: uri });
-        } catch (e) {
-            alert(e)
-        }
-    }
-
-    onPressNextStep(step) {
-        if (step == 1) {
-            Toast.show('ابتدا ویدیو ضبط نمایید');
-        } else if (step == 2) {
-            Toast.show('چند لحظه صبر کنید');
-        } else if (step == 3) {
-            if (this.state.isStatusPhoto) {
-                storage.set("VideoRecord2", this.state.videoUri);
-                this.camera.pausePreview();
-                this.props.history.push(`/twelveStep`);
-            } else {
-                Toast.show('اطلاعات ارسالی تایید نشد دوباره تلاش کنید');
+                toast.warn("اطلاعات ارسالی تایید نشد دوباره تلاش کنید");
             }
         }
-    }
+    };
 
-    render() {
-        const { isStartRecordOne, isEndRecordOne } = this.state;
-        let content = (
-            <FirstStepRecord
-                title={languages('send_two_field')}
-                description={languages('send_step_10_sedcription')}
-                func={this.startRecording.bind(this)}
+    let content = (
+        <FirstStepRecord
+            title={languages("send_two_field")}
+            description={languages("send_step_10_sedcription")}
+            func={startRecording}
+            pageCount={11}
+            footerNextFunc={() => onPressNextStep(1)}
+        />
+    );
+    if (isStartRecordOne) {
+        content = (
+            <TwoStepRecord
+                title="در حال ارسال"
+                description="سیستم در حال ارسال اطلاعات فیلد دوم می باشد لطفا چند لحظه صبر کنید"
+                func={startRecording}
                 pageCount={11}
-                footerNextFunc={() => this.onPressNextStep(1)}
+                footerNextFunc={() => onPressNextStep(2)}
             />
-        )
-        if (isStartRecordOne) {
-            setTimeout(() => {
-                this.camera.stopRecording();
-                this.takePicture();
-            }, 6000);
-            content = (
-                <TwoStepRecord
-                    title={'در حال ارسال'}
-                    description={'سیستم در حال ارسال اطلاعات فیلد دوم می باشد لطفا چند لحظه صبر کنید'}
-                    func={this.startRecording.bind(this)}
-                    pageCount={11}
-                    footerNextFunc={() => this.onPressNextStep(2)}
-                />
-            )
-        }
-        if (isEndRecordOne) {
-            content = (
-                <ThreeStepRecord
-                    status={this.state.isStatusPhoto}
-                    step={2}
-                    footerNextFunc={() => this.onPressNextStep(3)}
-                    footerAgainFunc={() => this.setState({ isEndRecordOne: false })}
-                />
-            )
-        }
-        return (
-            <div className="flex flex-col bg-white w-full h-full">
-                <RNCamera
-                    ref={ref => {
-                        this.camera = ref;
-                    }}
-                    style="flex-1"
-                    useNativeZoom={true}
-                    type={RNCamera.Constants.Type.back}
-                    flashMode={RNCamera.Constants.FlashMode.auto}
-                />
-                <div className="absolute top-0 w-full">
-                    <HelpHeader
-                        closeFunc={() => this.setState({ isCloseModal: true })}
-                        helpFunc={() => this.setState({ isHelpModal: true })}
-                        count={11}
-                    />
-                </div>
-                <div className="flex-1 bg-white">{content}</div>
-                <LoadingRecord isVisible={this.state.isLoading} />
-                <CloseModal
-                    visible={this.state.isCloseModal}
-                    resumeFunc={() => this.setState({ isCloseModal: false })}
-                />
-                <HelpModal
-                    visible={this.state.isHelpModal}
-                    closeFunc={() => this.setState({ isHelpModal: false })}
-                    description={languages("help_modal_txt_step_11")}
-                />
-            </div>
         );
     }
-};
+    if (isEndRecordOne) {
+        content = (
+            <ThreeStepRecord
+                status={isStatusPhoto}
+                step={2}
+                footerNextFunc={() => onPressNextStep(3)}
+                footerAgainFunc={() => setIsEndRecordOne(false)}
+            />
+        );
+    }
+
+    return (
+        <div className="flex flex-col bg-white w-full h-screen relative">
+            <video
+                ref={videoRef}
+                autoPlay
+                muted
+                className="flex-1 w-full h-full object-cover"
+            />
+            <div className="absolute top-0 w-full">
+                <HelpHeader
+                    closeFunc={() => setIsCloseModal(true)}
+                    helpFunc={() => setIsHelpModal(true)}
+                    count={11}
+                />
+            </div>
+            <div className="flex-1 bg-white">{content}</div>
+            <LoadingRecord isVisible={isLoading} />
+            <CloseModal
+                visible={isCloseModal}
+                resumeFunc={() => setIsCloseModal(false)}
+            />
+            <HelpModal
+                visible={isHelpModal}
+                closeFunc={() => setIsHelpModal(false)}
+                description={languages("help_modal_txt_step_11")}
+            />
+        </div>
+    );
+}
 
 export default ElevenStep;

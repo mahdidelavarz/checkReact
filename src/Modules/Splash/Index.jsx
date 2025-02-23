@@ -1,72 +1,71 @@
-import React from 'react';
-// import { ActivityIndicator, StatusBar, Alert, Button } from 'react-native';
-// import NetInfo from '@react-native-community/netinfo';
-// import * as Animatable from 'react-native-animatable';
-// import Toast from 'react-native-simple-toast';
-// import RNRestart from 'react-native-restart';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing props.history
+import { toast } from "react-toastify"; // Replacing Toast and Alert
 
-import CustomText from '../../Components/CustomText/CustomText';
-// import {colors} from '../../Assets/Styles/Colors';
-import Storage from '../../Factories/Storage';
-// import language from '../../Assets/i18n/i18n';
-import { downloadJson } from './Controller';
-// import Store from '../../Store/Store';
+import CustomText from "../../Components/CustomText/CustomText";
+import storage from "../../Factories/Storage"; // Import functional storage
+import { downloadJson } from "./Controller";
 
-let storage = new Storage();
+function Splash() {
+    const navigate = useNavigate();
+    const [isBtnRetry, setIsBtnRetry] = useState(false);
 
-class Splash extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isBtnRetry: false
-        };
-    }
+    useEffect(() => {
+        startApp();
+    }, [navigate]);
 
-    // componentDidMount() {
-    //     this.startApp();
-    // }
+    const startApp = () => {
+        if (navigator.onLine) {
+            getData().catch((err) => {
+                console.error("Error fetching data:", err);
+                retry();
+            });
+        } else {
+            internetAlert();
+        }
+    };
 
-    // startApp() {
-    //     NetInfo.fetch().then((state) => {
-    //         if (state.isConnected) {
-    //             this.getData().catch(err => this.retry());
-    //         } else {
-    //             this.internetAlert();
-    //         }
-    //     });
-    // }
+    const retry = () => {
+        setIsBtnRetry(true);
+    };
 
-    retry() {
-        this.setState({ isBtnRetry: true });
-    }
+    const onPressRetryDownloadJson = () => {
+        setIsBtnRetry(false);
+        startApp();
+    };
 
-    onPressRetryDownloadJson = () => {
-        this.setState({ isBtnRetry: false }, () => {
-            this.startApp();
-        });
-    }
-
-    restartApp() {
-        Toast.showWithGravity('خطای داخلی', Toast.LONG, Toast.TOP);
+    const restartApp = () => {
+        toast.error("خطای داخلی", { autoClose: 2000 }); // Show error for 2 seconds
         setTimeout(() => {
-            RNRestart.Restart();
+            window.location.reload(); // Web equivalent of restarting the app
         }, 2000);
-    }
+    };
 
-    async getData() {
-        var _version, _keylist;
-        await storage.get('Version', (version) => (_version = version));
-        await storage.get('keylist.json', (keylist) => (_keylist = keylist));
+    const getData = async () => {
+        let _version, _keylist;
+        await new Promise((resolve) => {
+            storage.get("Version", (version) => {
+                _version = version;
+                resolve();
+            });
+        });
+        await new Promise((resolve) => {
+            storage.get("keylist.json", (keylist) => {
+                _keylist = keylist;
+                resolve();
+            });
+        });
 
-        const response = await downloadJson('version.json');
+        const response = await downloadJson("version.json");
         if (!_version || _version !== response.version) {
-            const keylist = await downloadJson('keylist.json');
-            if (!_keylist) _keylist = {};
-            for (var file of keylist) {
+            const keylist = await downloadJson("keylist.json");
+            _keylist = _keylist ? JSON.parse(_keylist) : {};
+            for (const file of keylist) {
                 if (
                     _keylist[file.filename] &&
                     _keylist[file.filename].last_modified === file.last_modified
-                ) continue;
+                )
+                    continue;
 
                 const downloadedFile = await downloadJson(file.filename);
                 storage.set(file.filename, JSON.stringify(downloadedFile));
@@ -75,78 +74,66 @@ class Splash extends React.Component {
                     last_modified: file.last_modified,
                 };
             }
-            storage.set('keylist.json', JSON.stringify(_keylist));
-            storage.set('Version', response.version);
+            storage.set("keylist.json", JSON.stringify(_keylist));
+            storage.set("Version", response.version);
         }
-        this.checkIdentity();
-    }
+        checkIdentity();
+    };
 
-    checkIdentity() {
+    const checkIdentity = () => {
         setTimeout(() => {
-            storage.get('Token', (token) => {
+            storage.get("Token", (token) => {
                 if (token) {
-                    storage.get('Password', (password) => {
-                        this.props.history.push(password ? '/password' : '/tabBar');
+                    storage.get("Password", (password) => {
+                        navigate(password ? "/password" : "/tabBar");
                     });
                 } else {
-                    this.props.history.push('/conditions');
+                    navigate("/conditions");
                 }
             });
-        }, 5000);
-    }
+        }, 5000); // Match original 5-second delay
+    };
 
-    internetAlert() {
-        Alert.alert(
-            'عدم دسترسی به اینترنت',
-            'لطفا اتصال به اینترنت را چک کنید.',
-            [
-                {
-                    text: 'تلاش مجدد',
-                    onPress: () => RNRestart.Restart(),
-                },
-            ],
-            { cancelable: false },
-        );
-    }
+    const internetAlert = () => {
+        toast.error("عدم دسترسی به اینترنت\nلطفا اتصال به اینترنت را چک کنید.", {
+            onClose: () => restartApp(), // Restart app after alert closes
+        });
+    };
 
-    render() {
-        const { isBtnRetry } = this.state;
-        return (
-            <div className="flex flex-col bg-white h-full">
-                {/* <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} /> */}
-                <div
-                    className="flex-3 items-center justify-center bg-black"
-                    animation="zoomIn"
-                    duration={1500}
-                >
-                    <img className="w-32 h-32" src='/Images/logo.png' />
-                </div>
-                {!isBtnRetry ? (
-                    <div className="flex-2 items-center justify-center">
-                        {/* <ActivityIndicator size={'large'} color={colors.green} /> */}
-                    </div>
-                ) : (
-                    <div className="flex-2 items-center justify-center">
-                        <button
-                            className="w-1/2 h-10 rounded-full flex items-center justify-center bg-green-600"
-                            onPress={this.onPressRetryDownloadJson}
-                        >
-                            <CustomText font_weight={'bold'} className="text-white text-center text-lg">
-                                تلاش مجدد
-                            </CustomText>
-                        </button>
-                    </div>
-                )}
-                <div className="flex-5 items-center justify-center">
-                    <img
-                        className="w-4/5 h-4/5 object-center"
-                        src='/Images/happy_boy.png'
-                        alt="Happy Boy"
-                    />
-                </div>
+    return (
+        <div className="flex flex-col min-h-screen bg-white">
+            <div className="flex-3 flex items-center justify-center bg-black animate-zoomIn">
+                <img
+                    className="w-32 h-32 object-contain"
+                    src="/Images/logo.png"
+                    alt="Logo"
+                />
             </div>
-        );
-    }
+            {!isBtnRetry ? (
+                <div className="flex-2 flex items-center justify-center">
+                    <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            ) : (
+                <div className="flex-2 flex items-center justify-center">
+                    <button
+                        className="w-1/2 h-10 rounded-full flex items-center justify-center bg-green-600"
+                        onClick={onPressRetryDownloadJson}
+                    >
+                        <CustomText font_weight="bold" className="text-white text-center text-lg">
+                            تلاش مجدد
+                        </CustomText>
+                    </button>
+                </div>
+            )}
+            <div className="flex-5 flex items-center justify-center">
+                <img
+                    className="w-4/5 h-4/5 object-contain"
+                    src="/Images/happy_boy.png"
+                    alt="Happy Boy"
+                />
+            </div>
+        </div>
+    );
 }
 
 export default Splash;

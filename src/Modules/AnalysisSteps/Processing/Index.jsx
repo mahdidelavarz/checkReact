@@ -1,131 +1,129 @@
-import React, { Component } from 'react';
-import { BackHandler } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
-import RNFetchBlob from 'react-native-fetch-blob';
-import Toast from 'react-native-simple-toast';
-import LoadingRecord from '../../../Components/Analysis/LoadingRecord/LoadingRecord';
-import CloseModal from '../../../Components/Analysis/CloseModal/CloseModal';
-import CustomText from '../../../Components/CustomText/CustomText';
-import { statusHandle } from '../../../Factories/HttpHandler';
-import { process } from '../../../Components/Images/Images';
-import languages from '../../../Assets/i18n/i18n';
-import Storage from '../../../Factories/Storage';
-import { Url } from '../../../Configs/Urls';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
+import { toast } from "react-toastify"; // Replacing Toast
+
+import LoadingRecord from "../../../Components/Analysis/LoadingRecord/LoadingRecord";
+import CloseModal from "../../../Components/Analysis/CloseModal/CloseModal";
+import CustomText from "../../../Components/CustomText/CustomText";
+import { statusHandle } from "../../../Factories/HttpHandler";
+import { process } from "../../../Components/Images/Images";
+import languages from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage"; // Import functional storage
+import { Url } from "../../../Configs/Urls";
 
 let Token;
-let storage = new Storage();
 
-class Processing extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            isCloseModal: false,
-            isLoading: false
+function Processing() {
+    const navigate = useNavigate();
+    const [isCloseModal, setIsCloseModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            toast.info("امکان برگشت به مرحله قبل وجود ندارد"); // Replacing Toast.show
+            return true; // Prevent default back navigation
         };
-    }
+        window.addEventListener("popstate", handleBack);
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        storage.get("Token", token => Token = token);
-    }
+        // Fetch token
+        storage.get("Token", (token) => (Token = token));
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
 
-    handleBackButtonClick = () => {
-        Toast.show("امکان برگشت به مرحله قبل وجود ندارد");
-        return true;
-    }
-
-    onPressProcess = () => {
-        storage.get("VideoRecord1", video1 => {
-            storage.get("VideoRecord2", video2 => {
-                storage.get("VideoRecord3", video3 => {
-                    this.uploadVideo(video1, video2, video3);
+    const onPressProcess = () => {
+        storage.get("VideoRecord1", (video1) => {
+            storage.get("VideoRecord2", (video2) => {
+                storage.get("VideoRecord3", (video3) => {
+                    uploadVideo(video1, video2, video3);
                 });
             });
         });
-    }
+    };
 
-    uploadVideo(video1, video2, video3) {
-        NetInfo.fetch().then(state => {
-            if (state.isConnected) {
-                this.setState({ isLoading: true });
-                RNFetchBlob.fetch('POST', `${Url.serverUrl}Analysis/run/`, {
-                    Authorization: 'token ' + Token,
-                    'Content-Type': 'multipart/form-data',
-                    "Accept": "application/json",
-                }, [
-                    {
-                        name: 'video1',
-                        type: 'video/mp4',
-                        filename: 'video1.mp4',
-                        data: RNFetchBlob.wrap(video1)
+    const uploadVideo = async (video1, video2, video3) => {
+        // Replacing NetInfo with navigator.onLine
+        if (navigator.onLine) {
+            setIsLoading(true);
+            const formData = new FormData();
+            // Assuming videos are stored as blob URLs from previous steps (e.g., ElevenStep)
+            // Convert blob URLs to blobs if needed; here we assume they’re blob URLs or file paths
+            try {
+                const blob1 = await fetch(video1).then((res) => res.blob());
+                const blob2 = await fetch(video2).then((res) => res.blob());
+                const blob3 = await fetch(video3).then((res) => res.blob());
+
+                formData.append("video1", blob1, "video1.mp4");
+                formData.append("video2", blob2, "video2.mp4");
+                formData.append("video3", blob3, "video3.mp4");
+
+                const response = await fetch(`${Url.serverUrl}Analysis/run/`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `token ${Token}`,
+                        Accept: "application/json",
                     },
-                    {
-                        name: 'video2',
-                        type: 'video/mp4',
-                        filename: 'video2.mp4',
-                        data: RNFetchBlob.wrap(video2)
-                    },
-                    {
-                        name: 'video3',
-                        type: 'video/mp4',
-                        filename: 'video3.mp4',
-                        data: RNFetchBlob.wrap(video3)
-                    }
-                ])
-                    .then((res) => {
-                        statusHandle(res.respInfo.status, this.props.history);
-                        this.setState({ isLoading: false });
-                        if (res.respInfo.status == 200) {
-                            this.props.history.push(`/resultAnalysis`);
-                        } else {
-                            Toast.show('اطلاعات ارسالی تایید نشد دوباره تلاش کنید');
-                        }
-                    })
-                    .catch(() => {
-                        Toast.show('اطلاعات ارسالی تایید نشد دوباره تلاش کنید');
-                        this.setState({ isLoading: false });
-                    })
-            } else {
-                alert('عدم دسترسی به اینترنت', 'لطفا اتصال به اینترنت خود را چک کنید');
+                    body: formData,
+                });
+
+                statusHandle(response.status, navigate); // Updated to use navigate
+                setIsLoading(false);
+                if (response.status === 200) {
+                    navigate("/resultAnalysis");
+                } else {
+                    toast.warn("اطلاعات ارسالی تایید نشد دوباره تلاش کنید");
+                }
+            } catch (error) {
+                setIsLoading(false);
+                toast.warn("اطلاعات ارسالی تایید نشد دوباره تلاش کنید");
+                console.error("Upload error:", error);
             }
-        });
-    }
+        } else {
+            toast.error("عدم دسترسی به اینترنت. لطفا اتصال به اینترنت خود را چک کنید");
+        }
+    };
 
-    render() {
-        return (
-            <div className="flex flex-col h-screen bg-white">
-                {/* Header */}
-                <div className="w-full h-16 border-b border-gray-300 flex items-center justify-center">
-                    <CustomText className="text-lg font-bold text-gray-800">
-                        پردازش اطلاعات
-                    </CustomText>
-                </div>
-                
-                {/* Content */}
-                <div className="flex flex-1 flex-col items-center justify-evenly">
-                    <CustomText className="text-lg text-gray-900 text-center">
-                        برای پردازش اطلاعات دکمه زیر را فشار دهید
-                    </CustomText>
-                    <div className="w-1/3 h-1/3 border border-gray-300 rounded-full flex items-center justify-center">
-                        <button className="w-10/12 h-10/12 border border-gray-300 rounded-full flex items-center justify-center" onClick={this.onPressProcess}>
-                            <img className="w-20 h-20 text-green-500" src={process} />
-                        </button>
-                    </div>
-                </div>
-                
-                {/* Modals */}
-                <CloseModal
-                    visible={this.state.isCloseModal}
-                    resumeFunc={() => this.setState({ isCloseModal: false })}
-                />
-                <LoadingRecord isVisible={this.state.isLoading} />
+    const handleBackButtonClick = () => {
+        toast.info("امکان برگشت به مرحله قبل وجود ندارد");
+    };
+
+    return (
+        <div className="flex flex-col h-screen bg-white">
+            {/* Header */}
+            <div className="w-full h-16 border-b border-gray-300 flex items-center justify-center">
+                <CustomText className="text-lg font-bold text-gray-800">
+                    پردازش اطلاعات
+                </CustomText>
             </div>
-        );
-    }
-};
+
+            {/* Content */}
+            <div className="flex flex-1 flex-col items-center justify-evenly">
+                <CustomText className="text-lg text-gray-900 text-center">
+                    برای پردازش اطلاعات دکمه زیر را فشار دهید
+                </CustomText>
+                <div className="w-1/3 h-1/3 border border-gray-300 rounded-full flex items-center justify-center">
+                    <button
+                        className="w-10/12 h-10/12 border border-gray-300 rounded-full flex items-center justify-center"
+                        onClick={onPressProcess}
+                    >
+                        <img
+                            className="w-20 h-20"
+                            src={process}
+                            alt="Process Button"
+                        />
+                    </button>
+                </div>
+            </div>
+
+            {/* Modals */}
+            <CloseModal
+                visible={isCloseModal}
+                resumeFunc={() => setIsCloseModal(false)}
+            />
+            <LoadingRecord isVisible={isLoading} />
+        </div>
+    );
+}
 
 export default Processing;
