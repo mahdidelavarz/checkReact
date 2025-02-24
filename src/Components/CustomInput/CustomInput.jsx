@@ -1,62 +1,73 @@
-import React, { Component } from 'react';
-import { TextInput, Image, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import icEye from "../Images/ic_eye.png"; // Import images directly
+import icOffEye from "../Images/ic_off_eye.png";
 
-import { ic_eye, ic_off_eye } from '../Images/Images';
-import { colors } from '../../Assets/Styles/Colors';
+// import CustomText from "../../../../../Components/CustomText/CustomText";
 
-class CustomInput extends Component {
-    constructor(props) {
-        super(props);
-        if (this.props.onRef != null) {
-            this.props.onRef(this);
-        }
-        this.state = {
-            isVisiblePassword: false
-        }
+function CustomInput({
+  style,
+  placeholder,
+  event,
+  keyboardType,
+  mode,
+  autoCapitalize,
+  onRef,
+  onSubmitEditing,
+}) {
+  const [isVisiblePassword, setIsVisiblePassword] = useState(false);
+  const inputRef = React.useRef(null);
+
+  // Handle ref callback if provided
+  React.useEffect(() => {
+    if (onRef) {
+      onRef({
+        focus: () => inputRef.current.focus(),
+      });
     }
+  }, [onRef]);
 
-    onSubmitEditing() {
-        this.props.onSubmitEditing();
-    }
+  const onPressIsVisiblePassword = () => {
+    setIsVisiblePassword(!isVisiblePassword);
+  };
 
-    onPressIsVisiblePassword = () => {
-        this.setState({ isVisiblePassword: !this.state.isVisiblePassword });
+  const handleSubmitEditing = () => {
+    if (onSubmitEditing) {
+      onSubmitEditing();
     }
+  };
 
-    focus() {
-        this.textInput.focus()
-    }
+  // Map keyboardType to HTML input types where applicable
+  const inputType = mode === "password"
+    ? "password"
+    : keyboardType === "email-address"
+    ? "email"
+    : "text";
 
-    render() {
-        const { style, placeholder, event, keyboardType, mode, autoCapitalize } = this.props;
-        const { isVisiblePassword } = this.state;
-        return (
-            <div className="relative">
-                {mode === 'password' && (
-                    <TouchableOpacity 
-                        style="absolute right-1 bottom-0 z-10"
-                        onPress={this.onPressIsVisiblePassword}
-                    >
-                        <Image 
-                            style="w-5 h-5" 
-                            source={!isVisiblePassword ? ic_eye : ic_off_eye} 
-                        />
-                    </TouchableOpacity>
-                )}
-                <TextInput
-                    style={`w-full h-8 rounded-full text-sm text-left p-2 bg-white border border-light-txt mt-2 ${style}`}
-                    placeholder={placeholder}
-                    ref={input => this.textInput = input}
-                    onSubmitEditing={this.onSubmitEditing.bind(this)}
-                    placeholderTextColor={colors.ligh_txt}
-                    onChangeText={event}
-                    autoCapitalize={autoCapitalize}
-                    secureTextEntry={mode === 'password' ? !isVisiblePassword : false}
-                    keyboardType={keyboardType}
-                />
-            </div>
-        );
-    }
+  return (
+    <div className="relative">
+      {mode === "password" && (
+        <button
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10"
+          onClick={onPressIsVisiblePassword}
+        >
+          <img
+            className="w-5 h-5 object-cover"
+            src={isVisiblePassword ? icOffEye : icEye}
+            alt={isVisiblePassword ? "Hide Password" : "Show Password"}
+          />
+        </button>
+      )}
+      <input
+        ref={inputRef}
+        className={`w-full h-8 rounded-full text-sm text-left p-2 bg-white border border-gray-300 mt-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${style}`}
+        placeholder={placeholder}
+        onChange={(e) => event(e.target.value)}
+        onKeyPress={(e) => e.key === "Enter" && handleSubmitEditing()}
+        type={mode === "password" && !isVisiblePassword ? "password" : inputType}
+        autoCapitalize={autoCapitalize === "none" ? "off" : "on"}
+      />
+    </div>
+  );
 }
 
 export default CustomInput;

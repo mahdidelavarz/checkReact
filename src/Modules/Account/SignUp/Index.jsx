@@ -1,183 +1,173 @@
-import React, { Component } from 'react';
-import { ImageBackground, StatusBar, BackHandler, I18nManager, Alert, Platform } from 'react-native';
-import DropdownAlert from 'react-native-dropdownalert';
-import NetInfo from '@react-native-community/netinfo';
-import DeviceInfo from 'react-native-device-info';
-import Toast from 'react-native-simple-toast';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-import LoadingModal from '../../../Components/CustomModal/LoadingModal/LoadingModal';
-import { auto_back, auto_back_rtl } from '../../../Components/Images/Images';
-import SimpleButton from '../../../Components/CustomButton/SimpleButton';
-import CustomInput from '../../../Components/CustomInput/CustomInput';
-import CustomText from '../../../Components/CustomText/CustomText';
-import { findMessages } from '../../../Filters/Filters';
-import colors from '../../../Assets/Styles/Colors';
-import language from '../../../Assets/i18n/i18n';
-import { Url } from '../../../Configs/Urls';
+import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Import images directly
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
+import SimpleButton from "../../../Components/CustomButton/SimpleButton";
+import CustomInput from "../../../Components/CustomInput/CustomInput";
+import CustomText from "../../../Components/CustomText/CustomText";
+import { findMessages } from "../../../Filters/Filters";
+import language from "../../../Assets/i18n/i18n";
+// import storage from "../../../Factories/Storage";
+import { Url } from "../../../Configs/Urls";
 
-class SignUp extends Component {
-    constructor(props) {
-        super(props);
-        this.input = {};
-        this.state = {
-            back: auto_back_rtl,
-            email: '',
-            password: '',
-            confirmPass: '',
-            introCode: '',
-            isLoading: false
+function SignUp() {
+  const navigate = useNavigate();
+  const [back, setBack] = useState(autoBackRtl); // Default to RTL image
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [introCode, setIntroCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const inputs = useRef({}); // Replacing this.input for focusing
+
+  useEffect(() => {
+    // Check document direction instead of I18nManager.isRTL
+    if (document.dir !== "rtl") {
+      setBack(autoBack);
+    }
+
+    // Replacing BackHandler with browser back navigation
+    const handleBack = () => {
+      navigate(-1);
+      return true;
+    };
+    window.addEventListener("popstate", handleBack);
+
+    return () => window.removeEventListener("popstate", handleBack);
+  }, [navigate]);
+
+  const onPressSignUp = () => {
+    const emailCheck = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!email) {
+      toast.warn("لطفا ایمیل را وارد کنید");
+    } else if (!emailCheck.test(email)) {
+      toast.warn("ایمیل وارد شده صحیح نیست");
+    } else if (!password) {
+      toast.warn("لطفا پسورد را وارد کنید");
+    } else if (!confirmPass) {
+      toast.warn("لطفا تایید گذرواژه را وارد کنید");
+    } else if (confirmPass !== password) {
+      toast.warn("تایید گذرواژه با گذرواژه وارد شده مطابقت ندارد");
+    } else if (confirmPass.length < 8) {
+      toast.warn("گذرواژه حداقل باید 8 عدد یا حروف باشد");
+    } else {
+      sendUserInfo(email, confirmPass);
+    }
+  };
+
+  const sendUserInfo = (email, confirmPass) => {
+    if (navigator.onLine) {
+      setIsLoading(true);
+      const macAddress = "web-" + Math.random().toString(36).substring(2, 15); // Random ID for web
+      doRegister(macAddress, email, confirmPass);
+    } else {
+      toast.error("عدم دسترسی به اینترنت. لطفا اتصال به اینترنت را چک کنید.");
+    }
+  };
+
+  const doRegister = async (macAddress, email, confirmPass) => {
+    const deviceModel = "web"; // Static value for web
+    try {
+      const response = await fetch(`${Url.serverUrl}Auth/signup/`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          platform: "web", // Replacing Platform.OS
+          model: deviceModel,
+          mac: macAddress,
+          email: email.toLowerCase(),
+          password: confirmPass,
+        }),
+      });
+      const responseJson = await response.json();
+      setIsLoading(false);
+      findMessages(responseJson.detail, (message) => {
+        toast.info(message); // Replacing Toast.show
+      });
+      if (responseJson.id) {
+        const model = {
+          mac: macAddress,
+          email,
+          password: confirmPass,
+          userId: responseJson.id,
         };
+        const params = JSON.stringify(model);
+        navigate(`/confirmCode/${params}`);
+      }
+    } catch (error) {
+      toast.error(`${error.message}`);
+      setIsLoading(false);
     }
+  };
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-        if (!I18nManager.isRTL) {
-            this.setState({ back: auto_back });
-        }
+  const focusNextField = (id) => {
+    if (inputs.current[id]) {
+      inputs.current[id].focus();
     }
+  };
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+  return (
+    <div
+      className="min-h-screen flex flex-col bg-cover bg-center"
+      style={{ backgroundImage: `url(${back})` }}
+    >
+      <div className="flex-2.5" />
+      <div className="flex-6 flex flex-col">
+        <div className="flex-1 flex justify-center">
+          <CustomText font_weight="bold" className="text-[20px] text-green-500 ml-[60px]">
+            {language("signup")}
+          </CustomText>
+        </div>
+        <div className="flex-9 flex items-center justify-center">
+          <div className="w-[70%]">
+            <CustomInput
+              placeholder={language("email")}
+              event={(value) => setEmail(value)}
+              keyboardType="email-address" // Handled in CustomInput
+              autoCapitalize="none"
+              onSubmitEditing={() => focusNextField("password")}
+            />
+            <CustomInput
+              placeholder={language("password")}
+              event={(value) => setPassword(value)}
+              keyboardType="default"
+              mode="password"
+              onRef={(ref) => (inputs.current["password"] = ref)}
+              onSubmitEditing={() => focusNextField("confirm_password")}
+            />
+            <CustomInput
+              placeholder={language("confirm_password")}
+              event={(value) => setConfirmPass(value)}
+              keyboardType="default"
+              mode="password"
+              onRef={(ref) => (inputs.current["confirm_password"] = ref)}
+              onSubmitEditing={() => focusNextField("introCode")}
+            />
+            <CustomInput
+              placeholder={`${language("introduce")} ${language("optional")}`}
+              event={(value) => setIntroCode(value)}
+              keyboardType="default"
+              onRef={(ref) => (inputs.current["introCode"] = ref)}
+              onSubmitEditing={onPressSignUp}
+            />
+            <SimpleButton
+              func={onPressSignUp}
+              title={language("signup")}
+              btnStyle="mt-[10px]"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex-1.5" />
+      <LoadingModal isVisible={isLoading} />
+    </div>
+  );
+}
 
-    handleBackButtonClick = () => {
-        this.props.history.goBack();
-        return true;
-    }
-
-    onPressSignUp = () => {
-        const { email, password, confirmPass } = this.state;
-        const emailCheck = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if (!email) {
-            this.dropDownAlert.alertWithType('warn', 'لطفا ایمیل را وارد کنید');
-        } else if (emailCheck.test(email) === false) {
-            this.dropDownAlert.alertWithType('warn', 'ایمیل وارد شده صحیح نیست');
-        } else if (!password) {
-            this.dropDownAlert.alertWithType('warn', 'لطفا پسورد را وارد کنید');
-        } else if (!confirmPass) {
-            this.dropDownAlert.alertWithType('warn', 'لطفا تایید گذرواژه را وارد کنید');
-        } else if (confirmPass != password) {
-            this.dropDownAlert.alertWithType('warn', 'تایید گذرواژه با گذرواژه وارد شده مطابقت ندارد');
-        } else if (confirmPass.length < 8) {
-            this.dropDownAlert.alertWithType('warn', 'گذرواژه حداقل باید 8 عدد یا حروف باشد');
-        } else {
-            this.sendUserInfo(email, confirmPass);
-        }
-    }
-
-    sendUserInfo = (email, confirmPass) => {
-        NetInfo.fetch().then(state => {
-            if (state.isConnected) {
-                this.setState({ isLoading: true });
-                DeviceInfo.getMacAddress().then(macAddress => {
-                    this.doRegister(macAddress, email, confirmPass);
-                });
-            } else {
-                Alert.alert("عدم دسترسی به اینترنت", "لطفا اتصال به اینترنت را چک کنید.",
-                    [{ text: "متوجه شدم" }],
-                    { cancelable: false }
-                );
-            }
-        });
-    }
-
-    async doRegister(macAddress, email, confirmPass) {
-        let deviceModel = DeviceInfo.getModel();
-        try {
-            const response = await fetch(`${Url.serverUrl}Auth/signup/`, {
-                method: 'POST',
-                headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "platform": Platform.OS,
-                    "model": deviceModel,
-                    "mac": macAddress,
-                    "email": email.toLowerCase(),
-                    "password": confirmPass,
-                })
-            });
-            const responseJson = await response.json();
-            this.setState({ isLoading: false });
-            findMessages(responseJson.detail, message => {
-                Toast.show(message);
-            });
-            if (responseJson.id) {
-                const model = {
-                    "mac": macAddress,
-                    "email": email,
-                    "password": confirmPass,
-                    "userId": responseJson.id
-                };
-                const params = JSON.stringify(model);
-                this.props.history.push(`/confirmCode/${params}`);
-            }
-        } catch (error) {
-            Toast.show(`${error.message}`);
-            this.setState({ isLoading: false });
-        }
-    }
-
-    render() {
-        return (
-            <ImageBackground style="flex-1 flex-col" source={this.state.back}>
-                <StatusBar backgroundColor={colors.dark_green} barStyle={'light-content'} />
-                <DropdownAlert
-                    ref={ref => this.dropDownAlert = ref}
-                    inactiveStatusBarBackgroundColor={colors.dark_green}
-                    titleStyle="font-iranyekanwebbold(fanum) text-white text-sm"
-                />
-                <div className="flex-2.5" />
-                <div className="flex-6 flex-col">
-                    <div className="flex-1 justify-center">
-                        <CustomText font_weight={'bold'} style="text-green text-xl ml-15">
-                            {language('signup')}
-                        </CustomText>
-                    </div>
-                    <div className="flex-9 items-center justify-center">
-                        <div className="w-7/10">
-                            <CustomInput
-                                placeholder={language('email')}
-                                event={(value) => this.setState({ email: value })}
-                                keyboardType={'email-address'}
-                                autoCapitalize={'none'}
-                                onSubmitEditing={() => this.input['password'].focus()}
-                            />
-                            <CustomInput
-                                placeholder={language('password')}
-                                event={(value) => this.setState({ password: value })}
-                                keyboardType={'default'}
-                                mode={'password'}
-                                onRef={(ref) => this.input['password'] = ref}
-                                onSubmitEditing={() => this.input['confirm_password'].focus()}
-                            />
-                            <CustomInput
-                                placeholder={language('confirm_password')}
-                                event={(value) => this.setState({ confirmPass: value })}
-                                keyboardType={'default'}
-                                mode={'password'}
-                                onRef={(ref) => this.input['confirm_password'] = ref}
-                                onSubmitEditing={() => this.input['introCode'].focus()}
-                            />
-                            <CustomInput
-                                placeholder={language('introduce') + language('optional')}
-                                event={(value) => this.setState({ introCode: value })}
-                                keyboardType={'default'}
-                                onRef={(ref) => this.input['introCode'] = ref}
-                                onSubmitEditing={() => this.onPressSignUp()}
-                            />
-                            <SimpleButton
-                                func={this.onPressSignUp}
-                                title={language('signup')}
-                                btnStyle="mt-2.5"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-1.5" />
-                <LoadingModal
-                    isVisible={this.state.isLoading}
-                />
-            </ImageBackground>
-        );
-    }
-};
 export default SignUp;
