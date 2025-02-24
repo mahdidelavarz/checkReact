@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import './App.css'
 
-import Splash from './Modules/Splash/Index';
+// import Splash from './Modules/Splash/Index';
 import Home from './Modules/Home/Index';
 // import LogIn from './Modules/Account/LogIn/Index';
 // import SignIn from './Modules/Account/SignIn/Index';

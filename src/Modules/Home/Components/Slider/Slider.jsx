@@ -13,9 +13,9 @@ const CustomSlider = () => {
   const sliderRef = useRef(null);
   
   const data = [
-    { img: "test1" },
-    { img: "test2" },
-    { img: "test1" }
+    { img: "/Images/clip.png" },
+    { img: "/Images/clip.png" },
+    { img: "/Images/clip.png" }
   ];
 
   const settings = {
@@ -45,7 +45,7 @@ const CustomSlider = () => {
       <button className="rounded-xl focus:outline-none" onClick={() => {}}>
         <img
           className="w-full h-full rounded-xl object-cover"
-          src={"/Images/slide"}
+          src={item.img}
           alt="Slide"
         />
       </button>
@@ -53,7 +53,7 @@ const CustomSlider = () => {
   };
 
   return (
-    <div className="flex items-center w-full max-w-[calc(100%-25px)] mx-auto">
+    <div className=" w-full ">
       <Slider
         ref={sliderRef}
         {...settings}

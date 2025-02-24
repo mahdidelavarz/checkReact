@@ -22,7 +22,7 @@ const SimpleModal = ({
             src={img}
             className="w-6 h-6"
             alt="Modal icon"
-            style={{ filter: `hue-rotate(0deg) saturate(100%) brightness(100%)` }} // Approximation of tintColor
+            //! style={{ filter: `hue-rotate(0deg) saturate(100%) brightness(100%)` }} // Approximation of tintColor
           />
           <CustomText className="text-lg text-center text-gray-800">
             {title}

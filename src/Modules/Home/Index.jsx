@@ -134,27 +134,27 @@ function Home() {
           <BoxButton
             func={onPressGoToAnalysisScreen}
             title={language("online_sperm_analyze")}
-            img="/Images/sperm_analysis"
+            img="/Images/sperm_analysis.png"
           />
           <BoxButton
             func={() => navigate("/categories")}
             title={language("centers_search")}
-            img="/Images/specia_list"
+            img="/Images/specia_list.png"
           />
           <BoxButton
             func={() => navigate("/videoTraining")}
             title={language("video_training")}
-            img="/Images/videoSuccess"
+            img="/Images/videoSuccess.png"
           />
           <BoxButton
             func={() => navigate("/textTraining")}
             title={language("text_training")}
-            img="/Images/text_education"
+            img="/Images/text_education.png"
           />
           <BoxButton
             func={onPressGoToHistoryScreen}
             title={language("history")}
-            img="/Images/analytsis_history"
+            img="/Images/analytsis_history.png"
           />
           <BoxButton
             func={() =>
@@ -163,7 +163,7 @@ function Home() {
               )
             }
             title={language("training_of_medical_staff")}
-            img="/Images/health_education"
+            img="/Images/health_education.png"
           />
         </div>
       </main>
