@@ -1,27 +1,20 @@
-import React, { Component } from 'react';
+import React from "react";
+import CustomText from "../CustomText/CustomText";
 
-import CustomText from '../CustomText/CustomText';
-import { colors } from '../../Assets/Styles/Colors';
-
-class SimpleButton extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        const { func, btnStyle, title, titleStyle } = this.props;
-        return (
-            <button 
-                className={`w-full h-8 bg-green-500 rounded-full justify-center ${btnStyle}`} 
-                onClick={func} 
-                style={{ opacity: 0.8 }} // Equivalent to activeOpacity in React Native
+function SimpleButton({ func, btnStyle, title, titleStyle }) {
+    return (
+        <button
+            className={`w-full h-8 bg-green-500 rounded-full flex justify-center items-center hover:opacity-80 focus:opacity-80 ${btnStyle}`} // Added hover/focus for web interactivity
+            onClick={func}
+        >
+            <CustomText
+                className={`text-base text-white text-center ${titleStyle}`}
+                font_weight="bold"
             >
-                <CustomText className={`text-base text-white text-center ${titleStyle}`} font_weight={'bold'}>
-                    {title}
-                </CustomText>
-            </button>
-        );
-    }
+                {title}
+            </CustomText>
+        </button>
+    );
 }
 
 export default SimpleButton;

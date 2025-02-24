@@ -1,30 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
-import { toast } from "react-toastify"; // Replacing Toast and Alert
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
-import { auto_back, auto_back_rtl } from "../../../Components/Images/Images";
+import autoBack from "../../../Components/Images/auth_back_rtl.jpg";
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
 import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomText from "../../../Components/CustomText/CustomText";
 import { findMessages } from "../../../Filters/Filters";
 import ModalMsg from "./Components/ModalMsg/ModalMsg";
-import colors from "../../../Assets/Styles/Colors";
-import language from "../../../assets/i18n/i18n";
-import storage from "../../../Factories/Storage"; // Import functional storage
+import language from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
-
-// Removed let storage = new Storage();
 
 function LogIn() {
   const navigate = useNavigate();
-  const [back, setBack] = useState(auto_back_rtl);
+  const [back, setBack] = useState(autoBackRtl); // Default to RTL image
   const [isLoading, setIsLoading] = useState(false);
   const [isModal, setIsModal] = useState(false);
 
   useEffect(() => {
-    // Check document direction instead of I18nManager.isRTL
+    // Check document direction to set background image
     if (document.dir !== "rtl") {
-      setBack(auto_back);
+      setBack(autoBack); // Use non-RTL image
     }
 
     // Replacing BackHandler with browser back navigation
@@ -41,9 +39,7 @@ function LogIn() {
     setIsModal(false);
     setIsLoading(true);
 
-    // Replacing NetInfo with navigator.onLine
     if (navigator.onLine) {
-      // Replacing DeviceInfo.getMacAddress with a fallback (MAC not available in web)
       const macAddress = "web-" + Math.random().toString(36).substring(2, 15); // Random ID for web
       doAnonymous(macAddress);
     } else {
@@ -53,7 +49,7 @@ function LogIn() {
   };
 
   const doAnonymous = async (macAddress) => {
-    const model = "web"; // Replacing DeviceInfo.getModel with static value
+    const model = "web";
     try {
       const response = await fetch(`${Url.serverUrl}Auth/signup/anonymous/`, {
         method: "POST",
@@ -62,7 +58,7 @@ function LogIn() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          platform: "web", // Replacing Platform.OS
+          platform: "web",
           model,
           mac: macAddress,
         }),
@@ -70,10 +66,10 @@ function LogIn() {
       const responseJson = await response.json();
       setIsLoading(false);
       findMessages(responseJson.detail, (message) => {
-        toast.info(message); // Replacing Toast.show
+        toast.info(message);
       });
       if (responseJson.token) {
-        storage.set("Token", responseJson.token); // Updated to functional storage
+        storage.set("Token", responseJson.token);
         navigate("/tabBar");
       }
     } catch (error) {
@@ -84,10 +80,9 @@ function LogIn() {
 
   return (
     <div
-      className="flex-1 flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: `url(${back})` }}
+      className="w-full h-[100vh] bg-cover flex"
+      style={{ backgroundImage: `url(${back})` }} // Use imported image URL
     >
-      {/* StatusBar not needed in web; can use CSS if desired */}
       <div className="flex-2.5" />
       <div className="flex-6 flex flex-col">
         <div className="flex-1 flex justify-center">

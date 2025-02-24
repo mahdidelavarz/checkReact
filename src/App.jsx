@@ -6,8 +6,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import './App.css'
 
-// import Splash from './Modules/Splash/Index';
+import Splash from './Modules/Splash/Index';
 import Home from './Modules/Home/Index';
+import LogIn from './Modules/Account/LogIn/Index';
 // import LogIn from './Modules/Account/LogIn/Index';
 // import SignIn from './Modules/Account/SignIn/Index';
 // import SignUp from './Modules/Account/SignUp/Index';
@@ -66,10 +67,15 @@ function App() {
       <ToastContainer />
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* <Route path="/" element={<Home />} /> */}
+
           {/* <Route key={"splash"} exact path={"/"} element={Splash} /> */}
-          {/* <Route key={"logIn"} exact path={"/logIn"} element={LogIn} />
-        <Route key={"SignIn"} exact path={"/SignIn"} element={SignIn} />
+          {/* <Route path={"/"} element={<Splash />} /> */}
+
+          {/* <Route key={"logIn"} exact path={"/logIn"} element={LogIn} /> */}
+          <Route  path={"/"} element={<LogIn />} />
+
+          {/*  <Route key={"SignIn"} exact path={"/SignIn"} element={SignIn} />
         <Route key={"signUp"} exact path={"/signUp"} element={SignUp} />
         <Route key={"password"} exact path={"/password"} element={Password} />
         <Route key={"forgotPassword"} exact path={"/forgotPassword"} element={ForgotPassword} />
