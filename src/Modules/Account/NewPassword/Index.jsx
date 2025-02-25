@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
-import { toast } from "react-toastify"; // Replacing Toast and DropdownAlert
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
-import { auto_back, auto_back_rtl } from "../../../Components/Images/Images";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Import images directly
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
 import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomInput from "../../../Components/CustomInput/CustomInput";
 import CustomText from "../../../Components/CustomText/CustomText";
 import { findMessages } from "../../../Filters/Filters";
-import colors from "../../../Assets/Styles/Colors";
-import language from "../../../assets/i18n/i18n";
+import language from "../../../Assets/i18n/i18n";
 import { Url } from "../../../Configs/Urls";
 
 function NewPassword() {
   const navigate = useNavigate();
-  const [back, setBack] = useState(auto_back_rtl);
+  const [back, setBack] = useState(autoBackRtl); // Default to RTL image
   const [isLoading, setIsLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [email, setEmail] = useState("");
-  const inputs = useRef({}); // Replacing this.inputs for focusing
+  const inputs = useRef({});
 
   useEffect(() => {
-    // Check document direction instead of I18nManager.isRTL
+    // Check document direction to set background image
     if (document.dir !== "rtl") {
-      setBack(auto_back);
+      setBack(autoBack);
     }
 
     // Replacing BackHandler with browser back navigation
@@ -44,10 +44,9 @@ function NewPassword() {
   };
 
   const onPressChangePassword = () => {
-    // Replacing NetInfo with navigator.onLine
     if (navigator.onLine) {
       if (!email) {
-        toast.warn("لطفا ایمیل را وارد کنید"); // Replacing DropdownAlert
+        toast.warn("لطفا ایمیل را وارد کنید");
       } else if (!confirmPassword) {
         toast.warn("لطفا کد ارسالی به ایمیل را وارد کنید");
       } else if (!newPassword) {
@@ -80,7 +79,7 @@ function NewPassword() {
       const responseJson = await response.json();
       setIsLoading(false);
       findMessages(responseJson.detail, (message) => {
-        toast.info(message); // Replacing Toast.show
+        toast.info(message);
       });
       if (responseJson.detail) {
         navigate("/SignIn");
@@ -93,10 +92,9 @@ function NewPassword() {
 
   return (
     <div
-      className="flex-1 flex flex-col bg-cover bg-center"
-      style={{ backgroundImage: `url(${back})` }}
+      className="min-h-screen flex flex-col bg-cover bg-center"
+      style={{ backgroundImage: `url(${back})` }} // Use imported image URL
     >
-      {/* DropdownAlert and StatusBar not needed in web */}
       <div className="flex-2.5" />
       <div className="flex-6 flex flex-col">
         <div className="flex-1 flex justify-center">
@@ -109,7 +107,7 @@ function NewPassword() {
             <CustomInput
               placeholder={language("email")}
               event={(value) => setEmail(value)}
-              keyboardType="email-address" // Adjust in CustomInput for web
+              keyboardType="email-address"
               autoCapitalize="none"
               onSubmitEditing={() => focusNextField("confirm_password")}
             />

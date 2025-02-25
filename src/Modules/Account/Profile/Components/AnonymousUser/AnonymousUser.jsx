@@ -2,7 +2,6 @@ import React from 'react';
 
 import SimpleButton from '../../../../../Components/CustomButton/SimpleButton';
 import CustomText from '../../../../../Components/CustomText/CustomText';
-import colors from '../../../../../Assets/Styles/Colors';
 import languages from '../../../../../Assets/i18n/i18n';
 
 function AnonymousUser(props) {

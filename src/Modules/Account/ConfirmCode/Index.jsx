@@ -1,44 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify"; // Replacement for react-native-simple-toast
-import storage from "../../../Factories/Storage";
-import Store from "../../../Store/Store";
+import { toast } from "react-toastify";
+
 import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
 import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomInput from "../../../Components/CustomInput/CustomInput";
 import CustomText from "../../../Components/CustomText/CustomText";
 import { findMessages } from "../../../Filters/Filters";
 import { Url } from "../../../Configs/Urls";
-
-import auto_back from "../../../Components/Images/auto_back.png";
-import auto_back_rtl from "../../../Components/Images/auto_back_rtl.png";
-
-// No need to instantiate storage; it's already an object
-// let storage = new Storage(); // Remove this line
+import storage from "../../../Factories/Storage";
+import Store from "../../../Store/Store";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Updated per your instruction
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg"; // Updated per your instruction
 
 function ConfirmCode() {
   const navigate = useNavigate();
   const { userId } = useParams();
   const [params] = useState(JSON.parse(userId));
   const [isLoading, setIsLoading] = useState(false);
-  const [back, setBack] = useState(auto_back_rtl);
+  const [back, setBack] = useState(autoBackRtl); // Default to RTL image
   const [code, setCode] = useState("");
 
   useEffect(() => {
+    // Check document direction to set background image
     if (document.dir !== "rtl") {
-      setBack(auto_back);
+      setBack(autoBack);
     }
+
+    // Replacing BackHandler with browser back navigation
     const handleBack = () => {
       navigate(-1);
       return true;
     };
     window.addEventListener("popstate", handleBack);
+
     return () => window.removeEventListener("popstate", handleBack);
   }, [navigate]);
 
   const onPressSubmit = () => {
     if (!code) {
-      toast.warn("لطفا کد دریافتی را وارد کنید"); // Replaced DropdownAlert with toast
+      toast.warn("لطفا کد دریافتی را وارد کنید");
     } else {
       setIsLoading(true);
       doConfirmCode(code);
@@ -60,20 +61,21 @@ function ConfirmCode() {
       });
       const responseJson = await response.json();
       findMessages(responseJson.detail, (message) => {
-        toast.info(message); // Replaced Toast.show with toast
+        toast.info(message);
       });
       if (responseJson.detail) {
         doLogin();
+      } else {
+        setIsLoading(false); // Ensure loading stops if no detail
       }
     } catch (error) {
-      toast.error(`${error.message}`); // Replaced Toast.show with toast
+      toast.error(`${error.message}`);
       setIsLoading(false);
     }
   };
 
   const doLogin = async () => {
-    // DeviceInfo.getModel() isn't available in web; use a fallback or skip
-    const model = "web"; // Static value for web, or fetch from navigator if needed
+    const model = "web"; // Static value for web
     try {
       const response = await fetch(`${Url.serverUrl}Auth/login/`, {
         method: "POST",
@@ -84,7 +86,7 @@ function ConfirmCode() {
         body: JSON.stringify({
           platform: "web",
           mac: params.mac,
-          model: model,
+          model,
           email: params.email,
           password: params.password,
         }),
@@ -92,29 +94,27 @@ function ConfirmCode() {
       const responseJson = await response.json();
       setIsLoading(false);
       findMessages(responseJson.detail, (message) => {
-        toast.info(message); // Replaced Toast.show with toast
+        toast.info(message);
       });
       const token = responseJson.token;
       if (token) {
-        storage.set("Token", token); // Use functional storage directly
+        storage.set("Token", token);
         Store.setToken(token);
         navigate("/tabBar");
       }
     } catch (error) {
       setIsLoading(false);
+      toast.error(`${error.message}`);
     }
   };
 
   return (
     <div
-      className="flex flex-col h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${back})` }}
+      className="min-h-screen flex flex-col bg-cover bg-center"
+      style={{ backgroundImage: `url(${back})` }} // Use imported image URL
     >
-      {/* Top Section */}
       <div className="flex-2.5" />
-
-      {/* Center Section */}
-      <div className="flex-6 flex flex-col items-center justify-center">
+      <div className="flex-6 flex flex-col">
         <div className="flex-1 flex justify-center">
           <CustomText font_weight="bold" className="text-lg text-green-600">
             تایید کد دریافتی
@@ -124,7 +124,7 @@ function ConfirmCode() {
           <CustomInput
             placeholder="کد دریافتی"
             event={(value) => setCode(value)}
-            keyboardType="default" // Might not apply in web; adjust CustomInput if needed
+            keyboardType="default"
             onSubmitEditing={onPressSubmit}
             mode="password"
           />
@@ -135,11 +135,7 @@ function ConfirmCode() {
           />
         </div>
       </div>
-
-      {/* Bottom Section */}
       <div className="flex-1.5" />
-
-      {/* Loading Modal */}
       <LoadingModal isVisible={isLoading} />
     </div>
   );

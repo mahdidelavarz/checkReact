@@ -1,5 +1,5 @@
 import React from 'react';
-import { loading } from '../Images/Images';
+import loading from '../Images/loading.gif';
 
 function Loading() {
     return (

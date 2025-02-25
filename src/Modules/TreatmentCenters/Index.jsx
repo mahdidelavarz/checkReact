@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // Replacing BackHandler and props.history
-import { toast } from "react-toastify"; // Replacing potential alerts
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { orderByDistance } from "geolib";
 
-import { ic_location, ic_arrow, ic_phone } from "../../Components/Images/Images";
+import icLocation from "../../Components/Images/ic_location.png"; // Direct imports
+import icArrow from "../../Components/Images/ic_arrow.png";
+import icPhone from "../../Components/Images/ic_phone.png";
+import autoBack from "../../Components/Images/auth_back.jpg"; // Updated per your instruction
+import autoBackRtl from "../../Components/Images/auth_back_rtl.jpg";
 import SimpleModal from "../../Components/CustomModal/SimpleModal/SimpleModal";
 import CustomText from "../../Components/CustomText/CustomText";
 import FilterModal from "./Componets/FilterModal/FilterModal"; // Assuming 'Componets' typo is intentional
@@ -11,11 +15,11 @@ import SearchModal from "./Componets/SearchModal/SearchModal";
 import Loading from "../../Components/Loading/Loading";
 import Header from "./Componets/Header/Header";
 import language from "../../Assets/i18n/i18n";
-import storage from "../../Factories/Storage"; // Import functional storage
+import storage from "../../Factories/Storage";
 
 function TreatmentCenters() {
     const navigate = useNavigate();
-    const { id } = useParams(); // Replacing props.match.params.id
+    const { id } = useParams();
     const [isAccessLocation, setIsAccessLocation] = useState(false);
     const [isVisibleFilter, setIsVisibleFilter] = useState(false);
     const [isResultSearch, setIsResultSearch] = useState(false);
@@ -23,9 +27,15 @@ function TreatmentCenters() {
     const [isLoading, setIsLoading] = useState(false);
     const [searchData, setSearchData] = useState([]);
     const [data, setData] = useState([]);
-    const [arrayholder, setArrayholder] = useState([]); // Moved from class property to state
+    const [arrayholder, setArrayholder] = useState([]);
+    const [back, setBack] = useState(autoBackRtl); // Default to RTL image
 
     useEffect(() => {
+        // Check document direction to set background image
+        if (document.dir !== "rtl") {
+            setBack(autoBack);
+        }
+
         // Replacing BackHandler with browser back navigation
         const handleBack = () => {
             storage.remove("Select_Centers_Nearby");
@@ -51,7 +61,7 @@ function TreatmentCenters() {
                 storage.get("Select_Centers", (data) => {
                     const res = data ? JSON.parse(data) : [];
                     setData(res);
-                    setArrayholder(res); // Initialize arrayholder
+                    setArrayholder(res);
                     setIsLoading(false);
                 });
             }
@@ -89,7 +99,7 @@ function TreatmentCenters() {
                 },
                 (error) => {
                     console.error("Geolocation error:", error);
-                    setIsAccessLocation(true); // Show modal if location access denied
+                    setIsAccessLocation(true);
                 }
             );
         } else {
@@ -102,7 +112,7 @@ function TreatmentCenters() {
         storage.get("Select_Centers_Nearby", (data) => {
             const nearby = data ? JSON.parse(data) : null;
             if (!nearby) {
-                if (data[0]?.category === "ivf") {
+                if (data && data[0]?.category === "ivf") {
                     const filter = data.map((item) => ({
                         latitude: item.loc_latitude,
                         longitude: item.loc_longitude,
@@ -140,9 +150,8 @@ function TreatmentCenters() {
     };
 
     const onPressOpenSettingGps = () => {
-        // Web doesn't have a direct equivalent to open GPS settings; prompt user to enable manually
         toast.info("لطفاً دسترسی به موقعیت مکانی را در تنظیمات مرورگر فعال کنید.");
-        setIsAccessLocation(false); // Close modal; user must enable manually
+        setIsAccessLocation(false);
     };
 
     const handleBackButtonClick = () => {
@@ -151,7 +160,10 @@ function TreatmentCenters() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div
+            className="min-h-screen flex flex-col bg-cover bg-center"
+            style={{ backgroundImage: `url(${back})` }}
+        >
             <Header
                 func_back={handleBackButtonClick}
                 func_filter={onPressIsVisibleFilter}
@@ -166,11 +178,10 @@ function TreatmentCenters() {
                                     مراکز درمانی یافت نشد
                                 </CustomText>
                             ) : (
-                                data.map((item, index) => (
+                                data.map((item) => (
                                     <div
                                         key={item.id}
-                                        className={`w-[95%] h-[150px] bg-white rounded-md mt-2 flex flex-col items-center justify-between ${index + 1 === data.length ? "mb-10" : "mb-0"
-                                            } shadow-md`}
+                                        className="w-[95%] h-[150px] bg-white rounded-md mt-2 flex flex-col items-center justify-between shadow-md mb-2"
                                     >
                                         <div className="flex-3 flex justify-center">
                                             <CustomText className="font-bold text-center text-lg text-gray-800">
@@ -181,7 +192,7 @@ function TreatmentCenters() {
                                             <div className="flex-1 flex items-center justify-center">
                                                 <img
                                                     className="w-5 h-5"
-                                                    src={ic_location}
+                                                    src={icLocation}
                                                     alt="Location"
                                                 />
                                             </div>
@@ -196,7 +207,7 @@ function TreatmentCenters() {
                                         </div>
                                         <div className="flex-3.5 flex flex-row">
                                             <div className="flex-1 flex items-center justify-center">
-                                                <img className="w-5 h-5" src={ic_phone} alt="Phone" />
+                                                <img className="w-5 h-5" src={icPhone} alt="Phone" />
                                             </div>
                                             <div className="flex-[4] flex items-start justify-center">
                                                 <CustomText
@@ -208,7 +219,7 @@ function TreatmentCenters() {
                                             </div>
                                             <div className="flex-[4.5] flex items-end justify-center pr-2">
                                                 <button
-                                                    className="w-[70%] h-[70%] rounded-full bg-white border border-green-500 flex items-center justify-center"
+                                                    className="w-[70%] h-[70%] rounded-full bg-white border border-green-500 flex items-center justify-center hover:bg-green-50"
                                                     onClick={() => onPressItem(item)}
                                                 >
                                                     <CustomText className="text-green-500 text-sm">
@@ -216,7 +227,7 @@ function TreatmentCenters() {
                                                     </CustomText>
                                                     <img
                                                         className="w-2.5 h-2.5 ml-1"
-                                                        src={ic_arrow}
+                                                        src={icArrow}
                                                         alt="Arrow"
                                                     />
                                                 </button>
@@ -240,7 +251,7 @@ function TreatmentCenters() {
             />
             <SimpleModal
                 isVisible={isAccessLocation}
-                img={ic_location}
+                img={icLocation}
                 title="دسترسی به موقعیت مکانی"
                 description="لطفا جهت سهولت بیشتر، اجازه دسترسی به موقعیت مکانی را صادر نمایید."
                 right_func={onPressOpenSettingGps}

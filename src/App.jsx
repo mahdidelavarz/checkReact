@@ -9,16 +9,15 @@ import './App.css'
 import Splash from './Modules/Splash/Index';
 import Home from './Modules/Home/Index';
 import LogIn from './Modules/Account/LogIn/Index';
-// import LogIn from './Modules/Account/LogIn/Index';
 import SignIn from './Modules/Account/SignIn/Index';
 import SignUp from './Modules/Account/SignUp/Index';
-// import ConfirmCode from './Modules/Account/ConfirmCode/Index';
+import ConfirmCode from './Modules/Account/ConfirmCode/Index';
 import Password from './Modules/Account/Password/Index';
-// import Conditions from './Modules/Conditions/Index';
+import Conditions from './Modules/Conditions/Index';
 import ForgotPassword from './Modules/Account/ForgotPassword/Index';
-// import TabBar from './Router/TabBar/TabBar';
-// import Categories from './Modules/Categories/Index';
-// import TreatmentCenters from './Modules/TreatmentCenters/Index';
+import TabBar from './Router/TabBar/TabBar';
+import Categories from './Modules/Categories/Index';
+import TreatmentCenters from './Modules/TreatmentCenters/Index';
 // import ClinicDetails from './Modules/ClinicDetails/Index';
 // import History from './Modules/Account/History/Index';
 // import QRCodeScan from './Modules/QRCodeScan/Index';
@@ -39,7 +38,7 @@ import ForgotPassword from './Modules/Account/ForgotPassword/Index';
 // import ResultImg from './Modules/Account/ResultImg/Index';
 // import ResultVideo from './Modules/Account/ResultVideo/Index';
 // import Update from './Modules/Account/Update/Index';
-// import NewPassword from './Modules/Account/NewPassword/Index';
+import NewPassword from './Modules/Account/NewPassword/Index';
 
 // // analysis steps screen
 // import AddGadget from './Modules/AnalysisSteps/AddGadget/Index';
@@ -68,31 +67,24 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-
-          {/* <Route key={"splash"} exact path={"/"} element={Splash} /> */}
+          <Route key={"splash"} exact path={"/"} element={<Splash />} />
           {/* <Route path={"/"} element={<Splash />} /> */}
-
-          {/* <Route key={"logIn"} exact path={"/logIn"} element={LogIn} /> */}
+          <Route key={"logIn"} exact path={"/logIn"} element={<LogIn />} />
           {/* <Route  path={"/"} element={<LogIn />} /> */}
-
-          {/* <Route key={"SignIn"} exact path={"/SignIn"} element={SignIn} /> */}
+          <Route key={"SignIn"} exact path={"/SignIn"} element={<SignIn />} />
           {/* <Route path={"/SignIn"} element={<SignIn />} /> */}
-
-           {/* <Route key={"signUp"} exact path={"/signUp"} element={SignUp} /> */}
-           {/* <Route path={"/signUp"} element={<SignUp/>} /> */}
-
-        {/* <Route key={"password"} exact path={"/password"} element={<Password/>} /> */}
-
-        {/* <Route key={"forgotPassword"} exact path={"/forgotPassword"} element={<ForgotPassword/>} /> */}
-
-       {/* <Route key={"newPassword"} exact path={"/newPassword"} element={NewPassword} />
-        <Route key={"confirmCode"} exact path={"/confirmCode/:userId"} element={ConfirmCode} />
-        <Route key={"conditions"} exact path={"/conditions"} element={Conditions} />
-        <Route key={"update"} exact path={"/update"} element={Update} />
-        <Route key={"tabBar"} exact path={"/tabBar"} element={TabBar} />
-        <Route key={"categories"} exact path={"/categories"} element={Categories} />
-        <Route key={"treatmentCenters"} exact path={"/treatmentCenters/:id"} element={TreatmentCenters} />
-        <Route key={"clinicDetails"} exact path={"/clinicDetails/:id"} element={ClinicDetails} />
+          <Route key={"signUp"} exact path={"/signUp"} element={<SignUp />} />
+          {/* <Route path={"/signUp"} element={<SignUp/>} /> */}
+          <Route key={"password"} exact path={"/password"} element={<Password />} />
+          <Route key={"forgotPassword"} exact path={"/forgotPassword"} element={<ForgotPassword />} />
+          <Route key={"newPassword"} exact path={"/newPassword"} element={<NewPassword />} />
+          <Route key={"confirmCode"} exact path={"/confirmCode/:userId"} element={<ConfirmCode />} />
+          <Route key={"conditions"} exact path={"/conditions"} element={<Conditions />} />
+          {/* <Route key={"update"} exact path={"/update"} element={<Update/>} /> */}
+          <Route key={"tabBar"} exact path={"/tabBar"} element={<TabBar />} />
+          <Route key={"categories"} exact path={"/categories"} element={<Categories />} />
+          <Route key={"treatmentCenters"} exact path={"/treatmentCenters/:id"} element={<TreatmentCenters />} />
+          {/* <Route key={"clinicDetails"} exact path={"/clinicDetails/:id"} element={ClinicDetails} />
         <Route key={"history"} exact path={"/history"} element={History} />
         <Route key={"historyDetails"} exact path={"/historyDetails/:historyId"} element={HistoryDetails} />
         <Route key={"qRCodeScan"} exact path={"/qRCodeScan"} element={QRCodeScan} />
