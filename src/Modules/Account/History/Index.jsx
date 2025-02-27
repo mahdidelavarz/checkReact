@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
 import { toast } from "react-toastify"; // Replacing Alert
-import moment from "moment-jalaali";
+// import moment from "moment-jalaali";
 
 import CustomText from "../../../Components/CustomText/CustomText";
 import { statusHandle } from "../../../Factories/HttpHandler";
 import Loading from "../../../Components/Loading/Loading";
 import EmptyList from "./Components/EmptyList/EmptyList";
-import language from "../../../assets/i18n/i18n";
+import language from "../../../Assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 import Header from "./Components/Header/Header";
 import Chart from "./Components/Chart/Chart";

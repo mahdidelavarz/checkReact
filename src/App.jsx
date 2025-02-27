@@ -18,13 +18,13 @@ import ForgotPassword from './Modules/Account/ForgotPassword/Index';
 import TabBar from './Router/TabBar/TabBar';
 import Categories from './Modules/Categories/Index';
 import TreatmentCenters from './Modules/TreatmentCenters/Index';
-// import ClinicDetails from './Modules/ClinicDetails/Index';
-// import History from './Modules/Account/History/Index';
-// import QRCodeScan from './Modules/QRCodeScan/Index';
-// import AttachGadget from './Modules/AttachGadget/Index';
-// import TextTraining from './Modules/TextTraining/Index';
+import ClinicDetails from './Modules/ClinicDetails/Index';
+import History from './Modules/Account/History/Index';
+import QRCodeScan from './Modules/QRCodeScan/Index';
+import AttachGadget from './Modules/AttachGadget/Index';
+import TextTraining from './Modules/TextTraining/Index';
 // import VideoTraining from './Modules/VideoTraining/Index';
-// import HistoryDetails from './Modules/Account/HistoryDetails/Index';
+import HistoryDetails from './Modules/Account/HistoryDetails/Index';
 // import Languages from './Modules/Languages/Index';
 // import EditProfile from './Modules/Account/EditProfile/Index';
 // import Profile from './Modules/Account/Profile/Index';
@@ -68,13 +68,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route key={"splash"} exact path={"/"} element={<Splash />} />
-          {/* <Route path={"/"} element={<Splash />} /> */}
           <Route key={"logIn"} exact path={"/logIn"} element={<LogIn />} />
-          {/* <Route  path={"/"} element={<LogIn />} /> */}
           <Route key={"SignIn"} exact path={"/SignIn"} element={<SignIn />} />
-          {/* <Route path={"/SignIn"} element={<SignIn />} /> */}
           <Route key={"signUp"} exact path={"/signUp"} element={<SignUp />} />
-          {/* <Route path={"/signUp"} element={<SignUp/>} /> */}
           <Route key={"password"} exact path={"/password"} element={<Password />} />
           <Route key={"forgotPassword"} exact path={"/forgotPassword"} element={<ForgotPassword />} />
           <Route key={"newPassword"} exact path={"/newPassword"} element={<NewPassword />} />
@@ -84,13 +80,13 @@ function App() {
           <Route key={"tabBar"} exact path={"/tabBar"} element={<TabBar />} />
           <Route key={"categories"} exact path={"/categories"} element={<Categories />} />
           <Route key={"treatmentCenters"} exact path={"/treatmentCenters/:id"} element={<TreatmentCenters />} />
-          {/* <Route key={"clinicDetails"} exact path={"/clinicDetails/:id"} element={ClinicDetails} />
-        <Route key={"history"} exact path={"/history"} element={History} />
-        <Route key={"historyDetails"} exact path={"/historyDetails/:historyId"} element={HistoryDetails} />
-        <Route key={"qRCodeScan"} exact path={"/qRCodeScan"} element={QRCodeScan} />
-        <Route key={"attachGadget"} exact path={"/attachGadget/:code"} element={AttachGadget} />
-        <Route key={"textTraining"} exact path={"/textTraining"} element={TextTraining} />
-        <Route key={"videoTraining"} exact path={"/videoTraining"} element={VideoTraining} />
+          <Route key={"clinicDetails"} exact path={"/clinicDetails/:id"} element={<ClinicDetails />} />
+          <Route key={"history"} exact path={"/history"} element={<History />} />
+          <Route key={"historyDetails"} exact path={"/historyDetails/:historyId"} element={<HistoryDetails />} />
+          <Route key={"qRCodeScan"} exact path={"/qRCodeScan"} element={<QRCodeScan />} />
+          <Route key={"attachGadget"} exact path={"/attachGadget/:code"} element={<AttachGadget />} />
+          <Route key={"textTraining"} exact path={"/textTraining"} element={<TextTraining />} />
+          {/*<Route key={"videoTraining"} exact path={"/videoTraining"} element={VideoTraining} />
         <Route key={"addGadget"} exact path={"/addGadget"} element={AddGadget} />
         <Route key={"firstStep"} exact path={"/firstStep"} element={FirstStep} />
         <Route key={"secondStep"} exact path={"/secondStep"} element={SecondStep} />

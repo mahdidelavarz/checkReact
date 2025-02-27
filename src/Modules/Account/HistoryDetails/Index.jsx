@@ -1,28 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // Replacing BackHandler and props.history
-import { toast } from "react-toastify"; // For error messages if needed
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import SimpleHeader from "../../../Components/CustomHeader/SimpleHeader/SimpleHeader";
 import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomText from "../../../Components/CustomText/CustomText";
 import HeaderTable from "./Components/HeaderTable/HeaderTable";
 import ColumnTable from "./Components/ColumnTable/ColumnTable";
-import { happy_boy } from "../../../Components/Images/Images";
+import happyBoy from "../../../Components/Images/happy_boy.png"; // Direct import
 import { CustomPDF } from "./Components/CustomPDF/CustomPDF";
 import Loading from "../../../Components/Loading/Loading";
 import { findMessages } from "../../../Filters/Filters";
-import languages from "../../../assets/i18n/i18n";
-import storage from "../../../Factories/Storage"; 
+import languages from "../../../Assets/i18n/i18n";
+import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Updated per your instruction
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
 
-// Variables moved outside the component for simplicity (could use state if reactive)
+// Variables moved outside as module-level (could use state if reactive)
 let Token;
 let fullName;
 let phoneNumber;
 
 function HistoryDetails() {
   const navigate = useNavigate();
-  const { historyId } = useParams(); // Replacing props.match.params
+  const { historyId } = useParams();
   const [totalMotile, setTotalMotile] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [message, setMessage] = useState("");
@@ -31,9 +33,15 @@ function HistoryDetails() {
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [imgUrl, setImgUrl] = useState(null); // For the image URL
+  const [imgUrl, setImgUrl] = useState(null);
+  const [back, setBack] = useState(autoBackRtl); // Default to RTL image
 
   useEffect(() => {
+    // Check document direction to set background image
+    if (document.dir !== "rtl") {
+      setBack(autoBack);
+    }
+
     // Replacing BackHandler with browser back navigation
     const handleBack = () => {
       navigate("/history");
@@ -86,7 +94,6 @@ function HistoryDetails() {
 
   const getResultImage = async (id) => {
     try {
-      // Replacing RNFetchBlob with fetch for web
       const response = await fetch(`${Url.serverUrl}Analysis/results/image/?analysis_id=${id}`, {
         method: "GET",
         headers: {
@@ -95,7 +102,7 @@ function HistoryDetails() {
         },
       });
       const blob = await response.blob();
-      const url = URL.createObjectURL(blob); // Create a URL for the image blob
+      const url = URL.createObjectURL(blob);
       setImgUrl(url);
     } catch (error) {
       console.error("Error fetching image:", error);
@@ -104,7 +111,7 @@ function HistoryDetails() {
   };
 
   const onPressResultImg = () => {
-    storage.set("ResultImg", imgUrl); // Store the URL
+    storage.set("ResultImg", imgUrl);
     navigate(`/resultImg/${historyId}`);
   };
 
@@ -128,7 +135,7 @@ function HistoryDetails() {
       immotile: Math.round(result.immotile || 0),
       imgUrl,
     };
-    CustomPDF(model); // Assuming CustomPDF works in web context
+    CustomPDF(model); // Usage is correct per updated CustomPDF
   };
 
   const handleBackButtonClick = () => {
@@ -136,12 +143,19 @@ function HistoryDetails() {
   };
 
   return (
-    <div className="flex-1">
+    <div
+      className="min-h-screen flex flex-col bg-cover bg-center"
+      style={{ backgroundImage: `url(${back})` }}
+    >
       <SimpleHeader func={handleBackButtonClick} title={languages("history_details")} />
       {!isLoading ? (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto p-4">
           <div className="w-full h-48 flex justify-center items-center">
-            <img className="w-4/5 h-4/5 object-contain" src={happy_boy} alt="Happy Boy" />
+            <img
+              className="w-4/5 h-4/5 object-contain"
+              src={happyBoy}
+              alt="Happy Boy"
+            />
           </div>
           <div className="w-11/12 mx-auto border border-gray-400 mt-2 rounded-lg">
             <div className="h-8 bg-green-500 flex justify-center items-center">
@@ -221,7 +235,7 @@ function HistoryDetails() {
             <button onClick={onPressResultImg} className="w-full">
               <img
                 className="w-full h-48 rounded-lg object-cover"
-                src={imgUrl || "placeholder.jpg"} // Fallback image if imgUrl is null
+                src={imgUrl || "placeholder.jpg"}
                 alt="Result Image"
               />
             </button>
@@ -240,11 +254,11 @@ function HistoryDetails() {
   );
 }
 
-export default HistoryDetails;
-
 function percent(value = 0, total = 0, immotile = 0) {
-  const result = (Math.round(value) / (total + immotile)) * 100 || 0; // Avoid NaN
+  const result = (Math.round(value) / (total + immotile)) * 100 || 0;
   const string = result.toString();
   const indexOf = string.indexOf(".");
   return indexOf === -1 ? string : string.substring(0, indexOf === 2 ? 5 : 4);
 }
+
+export default HistoryDetails;

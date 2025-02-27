@@ -1,61 +1,68 @@
-import React, { useState } from 'react';
-import { TextInput, Image, I18nManager } from 'react-native';
+import React, { useState } from "react";
+import icBack from "../../../../../Components/Images/ic_back.png"; // Direct imports
+import icLeftBack from "../../../../../Components/Images/ic_left_back.png";
+import icSearch from "../../../../../Components/Images/ic_search.png";
+import icClose from "../../../../../Components/Images/ic_close.png";
+import CustomText from "../../../../../Components/CustomText/CustomText";
+import language from "../../../../../Assets/i18n/i18n";
 
-import { ic_back, ic_left_back, ic_search, ic_close } from '../../../../../Components/Images/Images';
-import CustomText from '../../../../../Components/CustomText/CustomText';
-import colors from '../../../../../Assets/Styles/Colors';
-import language from '../../../../../Assets/i18n/i18n';
-
-const Header = (props) => {
+function Header({ func_back, event }) {
     const [isVisibleInput, setIsVisibleInput] = useState(false);
-    const { func_back, event } = props;
+    const isRTL = document.dir === "rtl"; // Replacing I18nManager.isRTL
 
     return (
-        <div>
-            {!isVisibleInput ?
-                <div className="w-full h-15 bg-green-600 flex flex-row border-b border-dark-green">
-                    <button className="flex-1.5 items-center justify-center" onPress={func_back}>
-                        <Image className="w-6 h-6 tint-white" source={I18nManager.isRTL ? ic_back : ic_left_back} />
+        <div className="w-full h-15 bg-green-600 border-b border-green-800">
+            {!isVisibleInput ? (
+                <div className="flex flex-row h-full">
+                    <button
+                        className="flex-1.5 flex items-center justify-center hover:bg-green-700"
+                        onClick={func_back}
+                    >
+                        <img
+                            className="w-6 h-6"
+                            src={isRTL ? icBack : icLeftBack}
+                            alt="Back Icon"
+                        />
                     </button>
-                    <div className="flex-7 justify-center">
+                    <div className="flex-7 flex justify-center items-center">
                         <CustomText className="text-center text-white text-base">
-                            {language('historys')}
+                            {language("historys")}
                         </CustomText>
                     </div>
-                    <button className="flex-1.5 items-center justify-center" onPress={() => setIsVisibleInput(!isVisibleInput)}>
-                        <Image className="w-5 h-5 tint-white" source={ic_search} />
+                    <button
+                        className="flex-1.5 flex items-center justify-center hover:bg-green-700"
+                        onClick={() => setIsVisibleInput(!isVisibleInput)}
+                    >
+                        <img
+                            className="w-5 h-5"
+                            src={icSearch}
+                            alt="Search Icon"
+                        />
                     </button>
                 </div>
-                :
-                <div className="w-full h-15 justify-center bg-green-600 border-b border-dark-green">
-                    <button className="absolute left-2 z-10 w-10 h-11 items-center justify-center" onPress={() => setIsVisibleInput(!isVisibleInput)}>
-                        <Image className="w-7 h-7 tint-light-text" source={ic_close} />
+            ) : (
+                <div className="relative flex justify-center items-center h-full">
+                    <button
+                        className="absolute left-2 z-10 w-10 h-11 flex items-center justify-center hover:bg-green-700"
+                        onClick={() => setIsVisibleInput(!isVisibleInput)}
+                    >
+                        <img
+                            className="w-7 h-7"
+                            src={icClose}
+                            alt="Close Icon"
+                        />
                     </button>
-                    <TextInput
-                        style={{
-                            width: '95%',
-                            alignSelf: 'center',
-                            height: 45,
-                            borderRadius: 30,
-                            fontFamily: 'iranyekanwebregular(fanum)',
-                            fontSize: 12,
-                            color: colors.dark_txt,
-                            backgroundColor: colors.white,
-                            borderColor: colors.dark_txt,
-                            borderWidth: 0.5,
-                            paddingLeft: 45,
-                            textAlign: !I18nManager.isRTL ? 'left' : 'right',
-                            paddingTop: 10,
-                        }}
-                        placeholder={'جستجو بر اساس عنوان'}
-                        placeholderTextColor={colors.dark_txt}
-                        keyboardType={'default'}
-                        onChangeText={event}
+                    <input
+                        className="w-[95%] h-[45px] rounded-[30px] text-sm text-gray-800 bg-white border border-gray-600 py-2.5 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        style={{ textAlign: isRTL ? "right" : "left" }}
+                        placeholder="جستجو بر اساس عنوان"
+                        type="text"
+                        onChange={(e) => event(e.target.value)}
                     />
                 </div>
-            }
+            )}
         </div>
     );
-};
+}
 
 export default Header;

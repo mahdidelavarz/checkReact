@@ -1,9 +1,4 @@
 import React, { useState } from 'react';
-import { div, span } from 'react-native';
-
-import CustomText from '../../../../../Components/CustomText/CustomText';
-import { } from '../../../../../Components/Images/Images';
-import colors from '../../../../../Assets/Styles/Colors';
 
 function ColumnTable(props) {
     return (

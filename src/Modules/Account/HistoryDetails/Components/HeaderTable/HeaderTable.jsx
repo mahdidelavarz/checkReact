@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { div, button } from 'react-native';
 
 import CustomText from '../../../../../Components/CustomText/CustomText';
-import {} from '../../../../../Components/Images/Images';
-import colors from '../../../../../Assets/Styles/Colors';
+
+
 
 function HeaderTable(props) {
     return (

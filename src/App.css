@@ -16,3 +16,14 @@
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
 }
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+.animate-slide-down {
+  animation: slideDown 3s infinite linear;
+}
