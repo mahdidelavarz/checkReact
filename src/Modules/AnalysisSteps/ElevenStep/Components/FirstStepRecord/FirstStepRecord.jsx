@@ -1,32 +1,36 @@
-import React from 'react';
-import { View, Button, Image, Alert } from 'react-native';
-import Toast from 'react-native-simple-toast';
+import React from "react";
+import CustomText from "../../../../../Components/CustomText/CustomText";
+import Footer from "../../../../../Components/Analysis/Footer/Footer";
+import recVideo from "../../../../../Components/Images/recVideo.png"; // Direct import
+import { toast } from "react-toastify"; // Replacing Toast
 
-import CustomText from '../../../../../Components/CustomText/CustomText';
-import Footer from '../../../../../Components/Analysis/Footer/Footer';
-import { recVideo } from '../../../../../Components/Images/Images';
-import languages from '../../../../../Assets/i18n/i18n';
+function FirstStepRecord({ title, description, func, footerNextFunc, pageCount }) {
+  return (
+    <div className="flex-1 flex flex-col justify-between">
+      <CustomText className="font-bold text-center text-gray-800 text-sm mt-1">
+        {title}
+      </CustomText>
+      <CustomText className="text-center text-gray-800 text-xs w-[90%] mx-auto">
+        {description}
+      </CustomText>
+      <button
+        className="flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 p-2 rounded-full"
+        onClick={func}
+      >
+        <img
+          className="w-10 h-10 object-contain"
+          src={recVideo}
+          alt="Record Video"
+        />
+      </button>
+      <Footer
+        nextFunc={footerNextFunc}
+        screenCount={pageCount}
+        line="85%"
+        backFunc={() => toast.info("امکان برگشت به مرحله قبل امکان پذیر نیست")} // Replaced Toast.show
+      />
+    </div>
+  );
+}
 
-function FirstStepRecord(props) {
-    const { title, description, func, footerNextFunc, pageCount } = props;
-    return (
-        <View className="flex-1 justify-between">
-            <CustomText className="font-bold text-center text-dark-txt text-sm mt-1">
-                {title}
-            </CustomText>
-            <CustomText className="text-center text-dark-txt text-xs w-9/10 mx-auto">
-                {description}
-            </CustomText>
-            <Button style="items-center justify-center" onPress={func}>
-                <Image className="w-10 h-10" source={recVideo} />
-            </Button>
-            <Footer
-                nextFunc={footerNextFunc}
-                screenCount={pageCount}
-                line="85%"
-                backFunc={() => Toast.show('امکان برگشت به مرحله قبل امکان پذیر نیست')}
-            />
-        </View>
-    );
-};
 export default FirstStepRecord;

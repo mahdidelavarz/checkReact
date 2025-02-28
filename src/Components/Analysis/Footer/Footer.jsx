@@ -1,29 +1,30 @@
 import React from "react";
-import { I18nManager } from "react-native";
+import icArrow from "../../../Components/Images/ic_arrow.png"; // Direct import
 import CustomText from "../../CustomText/CustomText";
 import language from "../../../Assets/i18n/i18n";
-import { ic_arrow } from "../../Images/Images";
 import classNames from "classnames";
 
 const Footer = ({ nextFunc, screenCount, backFunc, line }) => {
+  const isRTL = document.dir === "rtl"; // Replacing I18nManager.isRTL
+
   return (
     <div
       className={classNames(
         "w-full h-16 flex bg-gray-200",
-        I18nManager.isRTL ? "flex-row" : "flex-row-reverse"
+        isRTL ? "flex-row" : "flex-row-reverse"
       )}
     >
       {/* Next Button */}
       <div className="flex-1 flex items-center justify-center">
         <button
-          className="w-4/5 h-9 flex items-center justify-center border border-gray-400 rounded-full"
+          className="w-4/5 h-9 flex items-center justify-center border border-gray-400 rounded-full hover:bg-gray-300 active:bg-gray-400"
           onClick={nextFunc}
         >
           <div className="flex items-center justify-center flex-1">
             <img
-              className="w-3 h-3 transform rotate-180 text-green-500"
-              src={ic_arrow}
-              alt="arrow"
+              className={classNames("w-3 h-3", !isRTL && "transform rotate-180")}
+              src={icArrow}
+              alt="Next Arrow"
             />
           </div>
           <div className="flex-2 flex items-center justify-center">
@@ -35,7 +36,7 @@ const Footer = ({ nextFunc, screenCount, backFunc, line }) => {
       </div>
 
       {/* Progress Bar & Screen Counter */}
-      <div className="flex-2 flex flex-col items-center">
+      <div className="flex-2 flex flex-col items-center justify-center">
         <div className="flex items-center justify-center text-gray-700 text-sm">
           <CustomText>{screenCount + "/12"}</CustomText>
         </div>
@@ -50,7 +51,7 @@ const Footer = ({ nextFunc, screenCount, backFunc, line }) => {
       {/* Back Button */}
       <div className="flex-1 flex items-center justify-center">
         <button
-          className="w-4/5 h-9 flex items-center justify-center border border-gray-400 rounded-full"
+          className="w-4/5 h-9 flex items-center justify-center border border-gray-400 rounded-full hover:bg-gray-300 active:bg-gray-400"
           onClick={backFunc}
         >
           <div className="flex-2 flex items-center justify-center">
@@ -59,7 +60,11 @@ const Footer = ({ nextFunc, screenCount, backFunc, line }) => {
             </CustomText>
           </div>
           <div className="flex items-center justify-center flex-1">
-            <img className="w-3 h-3 text-green-500" src={ic_arrow} alt="arrow" />
+            <img
+              className={classNames("w-3 h-3", isRTL && "transform rotate-180")}
+              src={icArrow}
+              alt="Back Arrow"
+            />
           </div>
         </button>
       </div>

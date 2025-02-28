@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
-import { toast } from "react-toastify"; // Replacing Toast and Alert
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import LoadingRecord from "../../../Components/Analysis/LoadingRecord/LoadingRecord";
 import HelpHeader from "../../../Components/Analysis/HelpHeader/HelpHeader";
@@ -12,8 +12,10 @@ import TwoStepRecord from "./Components/TwoStepRecord/TwoStepRecord";
 import { statusHandle } from "../../../Factories/HttpHandler";
 import { findMessages } from "../../../Filters/Filters";
 import languages from "../../../Assets/i18n/i18n";
-import storage from "../../../Factories/Storage"; // Import functional storage
+import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Added per your instruction
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
 
 let Token;
 
@@ -28,8 +30,14 @@ function TenStep() {
     const [isStatusPhoto, setIsStatusPhoto] = useState(false);
     const [videoBlob, setVideoBlob] = useState(null); // Store recorded video Blob
     const [stream, setStream] = useState(null); // Camera stream
+    const [back, setBack] = useState(autoBackRtl); // Default to RTL image
 
     useEffect(() => {
+        // Check document direction to set background image
+        if (document.dir !== "rtl") {
+            setBack(autoBack);
+        }
+
         // Replacing BackHandler with browser back navigation
         const handleBack = () => {
             setIsCloseModal(true);
@@ -40,7 +48,7 @@ function TenStep() {
         // Fetch token
         storage.get("Token", (token) => (Token = token));
 
-        // Request camera access (web equivalent of permissionCamera)
+        // Request camera access
         async function setupCamera() {
             try {
                 const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -79,7 +87,7 @@ function TenStep() {
         mediaRecorder.onstop = () => {
             const blob = new Blob(chunks, { type: "video/webm" });
             setVideoBlob(blob);
-            takePicture(blob); // Simulate taking a picture from the video
+            takePicture(blob);
         };
 
         mediaRecorder.start();
@@ -92,7 +100,7 @@ function TenStep() {
         setIsStartRecordOne(false);
         setIsLoading(true);
         setIsEndRecordOne(true);
-        uploadQcImage(videoBlob); // Use video blob as a proxy for image
+        uploadQcImage(videoBlob);
     };
 
     const uploadQcImage = async (blob) => {
@@ -139,8 +147,8 @@ function TenStep() {
             toast.info("چند لحظه صبر کنید");
         } else if (step === 3) {
             if (isStatusPhoto) {
-                storage.set("VideoRecord1", URL.createObjectURL(videoBlob)); // Store blob URL
-                if (stream) stream.getTracks().forEach((track) => track.stop()); // Stop camera
+                storage.set("VideoRecord1", URL.createObjectURL(videoBlob));
+                if (stream) stream.getTracks().forEach((track) => track.stop());
                 navigate("/elevenStep");
             } else {
                 toast.warn("اطلاعات ارسالی تایید نشد دوباره تلاش کنید");
@@ -180,24 +188,28 @@ function TenStep() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-white relative">
+        <div
+            className="min-h-screen flex flex-col bg-cover bg-center relative"
+            style={{ backgroundImage: `url(${back})` }}
+        >
             <video
                 ref={videoRef}
                 autoPlay
                 muted
-                className="flex-1 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover z-0"
             />
-            <div className="absolute top-0 w-full">
+            <div className="absolute top-0 w-full z-10">
                 <HelpHeader
                     closeFunc={() => setIsCloseModal(true)}
                     helpFunc={() => setIsHelpModal(true)}
                     count={10}
                 />
             </div>
-            <div className="flex-1 bg-white">{content}</div>
+            <div className="flex-1 bg-white z-10">{content}</div>
             <LoadingRecord isVisible={isLoading} />
             <CloseModal
                 visible={isCloseModal}
+                closeFunc={onPressCloseAnalysis}
                 resumeFunc={() => setIsCloseModal(false)}
             />
             <HelpModal

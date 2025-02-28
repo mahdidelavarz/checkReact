@@ -9,8 +9,10 @@ import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomText from "../../../Components/CustomText/CustomText";
 import Footer from "../../../Components/Analysis/Footer/Footer";
 import { statusHandle } from "../../../Factories/HttpHandler";
-import GadgetList from "./Components/GadgetList/GadgetList";
+// !gadjet list is imported from current path but it dose not exist
+import GadgetList from "../SecondStep/Components/GadgetList/GadgetList";
 import Loading from "../../../Components/Loading/Loading";
+// !emptyList list is imported from current path but it dose not exist
 import EmptyList from "./Components/EmptyList/EmptyList";
 import { Url } from "../../../Configs/Urls";
 import languages from "../../../Assets/i18n/i18n";

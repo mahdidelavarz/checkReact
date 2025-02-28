@@ -1,35 +1,38 @@
-import React from 'react';
-import { TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import React from "react";
+import CustomText from "../../../../../Components/CustomText/CustomText";
+import Footer from "../../../../../Components/Analysis/Footer/Footer";
+import recVideo from "../../../../../Components/Images/recVideo.png"; // Direct import
+import languages from "../../../../../Assets/i18n/i18n";
+import { toast } from "react-toastify"; // Replacing Alert
 
-import CustomText from '../../../../../Components/CustomText/CustomText';
-import Footer from '../../../../../Components/Analysis/Footer/Footer';
-import { recVideo } from '../../../../../Components/Images/Images';
-import colors from '../../../../../Assets/Styles/Colors';
-import languages from '../../../../../Assets/i18n/i18n';
-
-function TwoStepRecord(props) {
-    const { title, description, func, footerNextFunc, pageCount } = props;
-
-    return (
-        <div className="flex-1 justify-between">
-            <CustomText font_weight={'bold'} className="text-dark-txt text-center mt-1">
-                {title}
-            </CustomText>
-            <CustomText className="text-dark-txt text-center w-4/5 mx-auto text-sm">
-                {description}
-            </CustomText>
-            <div className="flex items-center justify-center relative" onPress={func}>
-                <ActivityIndicator size="large" color={colors.red} />
-                <Image className="w-4 h-4 absolute bottom-2" source={recVideo} />
-            </div>
-            <Footer
-                nextFunc={footerNextFunc}
-                screenCount={pageCount}
-                line={'85%'}
-                backFunc={() => Alert.alert('برگشت', 'امکان برگشت به مرحله قبل امکان پذیر نیست')}
-            />
-        </div>
-    );
+function TwoStepRecord({ title, description, func, footerNextFunc, pageCount }) {
+  return (
+    <div className="flex-1 flex flex-col justify-between">
+      <CustomText
+        font_weight="bold"
+        className="text-gray-800 text-center mt-1"
+      >
+        {title}
+      </CustomText>
+      <CustomText className="text-gray-800 text-center w-4/5 mx-auto text-sm">
+        {description}
+      </CustomText>
+      <div className="flex items-center justify-center relative">
+        <div className="w-10 h-10 border-4 border-red-500 rounded-full animate-spin"></div>
+        <img
+          className="absolute bottom-2 w-4 h-4 object-contain"
+          src={recVideo}
+          alt="Recording Icon"
+        />
+      </div>
+      <Footer
+        nextFunc={footerNextFunc}
+        screenCount={pageCount}
+        line="85%"
+        backFunc={() => toast.info("برگشت", "امکان برگشت به مرحله قبل امکان پذیر نیست")} // Replaced Alert.alert with toast
+      />
+    </div>
+  );
 }
 
 export default TwoStepRecord;

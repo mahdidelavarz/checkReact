@@ -1,17 +1,22 @@
 import React from "react";
-import { StatusBar } from "react-native";
-import { ic_close, ic_help } from "../../Images/Images";
+import icClose from "../../Images/ic_close.png"; // Direct import
+import icHelp from "../../Images/ic_help.png"; // Direct import
 import CustomText from "../../CustomText/CustomText";
 import language from "../../../Assets/i18n/i18n";
 
 const HelpHeader = ({ closeFunc, helpFunc, count }) => {
   return (
-    <div className="w-full h-14 bg-white border-b border-gray-300 flex flex-row">
-      <StatusBar backgroundColor="#006400" barStyle="light-content" />
-
+    <div className="w-full h-14 bg-white border-b border-gray-300 flex flex-row items-center">
       {/* Close Button */}
-      <button className="flex-1.5 flex items-center justify-center" onClick={closeFunc}>
-        <img className="w-7 h-7 text-gray-400" src={ic_close} alt="close" />
+      <button
+        className="flex-1.5 flex items-center justify-center hover:bg-gray-100 p-2 rounded-full"
+        onClick={closeFunc}
+      >
+        <img
+          className="w-7 h-7"
+          src={icClose}
+          alt="Close Icon"
+        />
       </button>
 
       {/* Step Counter */}
@@ -22,8 +27,15 @@ const HelpHeader = ({ closeFunc, helpFunc, count }) => {
       </div>
 
       {/* Help Button */}
-      <button className="flex-1.5 flex items-center justify-center" onClick={helpFunc}>
-        <img className="w-6 h-6 text-green-500" src={ic_help} alt="help" />
+      <button
+        className="flex-1.5 flex items-center justify-center hover:bg-gray-100 p-2 rounded-full"
+        onClick={helpFunc}
+      >
+        <img
+          className="w-6 h-6"
+          src={icHelp}
+          alt="Help Icon"
+        />
       </button>
     </div>
   );

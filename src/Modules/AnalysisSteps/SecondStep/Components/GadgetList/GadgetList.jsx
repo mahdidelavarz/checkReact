@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { toast } from "react-toastify"; // Replacing Toast
 import moment from "moment-jalaali";
 
-import { ic_date, ic_about, ic_barcode } from "../../../../../Components/Images/Images";
+import  ic_date  from "../../../../../Components/Images/ic_date.png";
+import  ic_about  from "../../../../../Components/Images/ic_about.png";
+import ic_barcode  from "../../../../../Components/Images/ic_barcode.png";
 import CustomText from "../../../../../Components/CustomText/CustomText";
 import languages from "../../../../../Assets/i18n/i18n";
 import storage from "../../../../../Factories/Storage"; // Import functional storage

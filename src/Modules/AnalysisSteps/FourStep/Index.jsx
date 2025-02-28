@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Replacing BackHandler and props.history
-import { toast } from "react-toastify"; // Replacing DropdownAlert and Toast
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import LoadingModal from "../../../Components/CustomModal/LoadingModal/LoadingModal";
 import HelpHeader from "../../../Components/Analysis/HelpHeader/HelpHeader";
@@ -11,16 +11,26 @@ import Footer from "../../../Components/Analysis/Footer/Footer";
 import { statusHandle } from "../../../Factories/HttpHandler";
 import RowList from "./Components/RowList/RowList";
 import languages from "../../../Assets/i18n/i18n";
-import storage from "../../../Factories/Storage"; // Import functional storage
+import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Added per your instruction
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
+
+let Token;
 
 function FourStep() {
     const navigate = useNavigate();
     const [isCloseModal, setIsCloseModal] = useState(false);
     const [isHelpModal, setIsHelpModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [back, setBack] = useState(autoBackRtl); // Default to RTL image
 
     useEffect(() => {
+        // Check document direction to set background image
+        if (document.dir !== "rtl") {
+            setBack(autoBack);
+        }
+
         // Replacing BackHandler with browser back navigation
         const handleBack = () => {
             setIsCloseModal(true);
@@ -39,7 +49,7 @@ function FourStep() {
                         storage.get("Volume", (volume) => {
                             storage.get("Viscosity", (viscosity) => {
                                 if (!title) {
-                                    toast.warn("لطفا عنوان را پر کنید"); // Replacing DropdownAlert
+                                    toast.warn("لطفا عنوان را پر کنید");
                                 } else if (!color) {
                                     toast.warn("لطفا رنگ را انتخاب کنید");
                                 } else if (!volume) {
@@ -75,7 +85,7 @@ function FourStep() {
                     volume,
                 }),
             });
-            statusHandle(response.status, navigate); // Updated to use navigate
+            statusHandle(response.status, navigate);
             if (response.status === 201) {
                 setIsLoading(false);
                 navigate("/fiveStep");
@@ -86,7 +96,7 @@ function FourStep() {
         } catch (error) {
             setIsLoading(false);
             console.error("Error:", error);
-            toast.error(`${error.message}`); // Optional: Add error feedback
+            toast.error(`${error.message}`);
         }
     };
 
@@ -96,18 +106,21 @@ function FourStep() {
 
     const onPressCloseAnalysis = () => {
         setIsCloseModal(false);
-        navigate("/tabBar"); // Assuming this is the intended close destination
+        navigate("/tabBar");
     };
 
     return (
-        <div className="flex flex-col h-screen bg-white">
+        <div
+            className="min-h-screen flex flex-col bg-cover bg-center"
+            style={{ backgroundImage: `url(${back})` }}
+        >
             <HelpHeader
                 closeFunc={handleBackButtonClick}
                 helpFunc={() => setIsHelpModal(true)}
                 count={4}
             />
             <div className="flex flex-col flex-1">
-                <div className="flex flex-col flex-4.5 justify-around">
+                <div className="flex flex-col flex-[4.5] justify-around">
                     <CustomText className="text-lg font-bold text-gray-800 text-center my-8">
                         {languages("sample_prop_head")}
                     </CustomText>
@@ -115,7 +128,7 @@ function FourStep() {
                         {languages("sample_prop_head_description")}
                     </CustomText>
                 </div>
-                <div className="flex flex-4.5 items-center justify-center mb-5">
+                <div className="flex-[4.5] flex items-center justify-center mb-5">
                     <RowList />
                 </div>
                 <div className="flex justify-center">

@@ -6,8 +6,7 @@ import LoadingRecord from "../../../Components/Analysis/LoadingRecord/LoadingRec
 import CloseModal from "../../../Components/Analysis/CloseModal/CloseModal";
 import CustomText from "../../../Components/CustomText/CustomText";
 import { statusHandle } from "../../../Factories/HttpHandler";
-import { process } from "../../../Components/Images/Images";
-import languages from "../../../Assets/i18n/i18n";
+import  process  from "../../../Components/Images/process.png";
 import storage from "../../../Factories/Storage"; // Import functional storage
 import { Url } from "../../../Configs/Urls";
 

@@ -23,9 +23,9 @@ import History from './Modules/Account/History/Index';
 import QRCodeScan from './Modules/QRCodeScan/Index';
 import AttachGadget from './Modules/AttachGadget/Index';
 import TextTraining from './Modules/TextTraining/Index';
-// import VideoTraining from './Modules/VideoTraining/Index';
+import VideoTraining from './Modules/VideoTraining/Index';
 import HistoryDetails from './Modules/Account/HistoryDetails/Index';
-// import Languages from './Modules/Languages/Index';
+import Languages from './Modules/Languages/Index';
 // import EditProfile from './Modules/Account/EditProfile/Index';
 // import Profile from './Modules/Account/Profile/Index';
 // import AboutUs from './Modules/Account/AboutUs/Index';
@@ -41,20 +41,20 @@ import HistoryDetails from './Modules/Account/HistoryDetails/Index';
 import NewPassword from './Modules/Account/NewPassword/Index';
 
 // // analysis steps screen
-// import AddGadget from './Modules/AnalysisSteps/AddGadget/Index';
-// import FirstStep from './Modules/AnalysisSteps/FirstStep/Index';
-// import SecondStep from './Modules/AnalysisSteps/SecondStep/Index';
-// import ThirdStep from './Modules/AnalysisSteps/ThirdStep/Index';
-// import FourStep from './Modules/AnalysisSteps/FourStep/Index';
-// import FiveStep from './Modules/AnalysisSteps/FiveStep/Index';
-// import SixStep from './Modules/AnalysisSteps/SixStep/Index';
-// import SevenStep from './Modules/AnalysisSteps/SevenStep/Index';
-// import EightStep from './Modules/AnalysisSteps/EightStep/Index';
-// import NineStep from './Modules/AnalysisSteps/NineStep/Index';
-// import TenStep from './Modules/AnalysisSteps/TenStep/Index';
-// import ElevenStep from './Modules/AnalysisSteps/ElevenStep/Index';
-// import TwelveStep from './Modules/AnalysisSteps/TwelveStep/Index';
-// import Processing from './Modules/AnalysisSteps/Processing/Index';
+import AddGadget from './Modules/AnalysisSteps/AddGadget/Index';
+import FirstStep from './Modules/AnalysisSteps/FirstStep/Index';
+import SecondStep from './Modules/AnalysisSteps/SecondStep/Index';
+import ThirdStep from './Modules/AnalysisSteps/ThirdStep/Index';
+import FourStep from './Modules/AnalysisSteps/FourStep/Index';
+import FiveStep from './Modules/AnalysisSteps/FiveStep/Index';
+import SixStep from './Modules/AnalysisSteps/SixStep/Index';
+import SevenStep from './Modules/AnalysisSteps/SevenStep/Index';
+import EightStep from './Modules/AnalysisSteps/EightStep/Index';
+import NineStep from './Modules/AnalysisSteps/NineStep/Index';
+import TenStep from './Modules/AnalysisSteps/TenStep/Index';
+import ElevenStep from './Modules/AnalysisSteps/ElevenStep/Index';
+import TwelveStep from './Modules/AnalysisSteps/TwelveStep/Index';
+import Processing from './Modules/AnalysisSteps/Processing/Index';
 // import ResultAnalysis from './Modules/AnalysisSteps/ResultAnalysis/Index';
 
 
@@ -86,24 +86,24 @@ function App() {
           <Route key={"qRCodeScan"} exact path={"/qRCodeScan"} element={<QRCodeScan />} />
           <Route key={"attachGadget"} exact path={"/attachGadget/:code"} element={<AttachGadget />} />
           <Route key={"textTraining"} exact path={"/textTraining"} element={<TextTraining />} />
-          {/*<Route key={"videoTraining"} exact path={"/videoTraining"} element={VideoTraining} />
-        <Route key={"addGadget"} exact path={"/addGadget"} element={AddGadget} />
-        <Route key={"firstStep"} exact path={"/firstStep"} element={FirstStep} />
-        <Route key={"secondStep"} exact path={"/secondStep"} element={SecondStep} />
-        <Route key={"thirdStep"} exact path={"/thirdStep"} element={ThirdStep} />
-        <Route key={"fourStep"} exact path={"/fourStep"} element={FourStep} />
-        <Route key={"fiveStep"} exact path={"/fiveStep"} element={FiveStep} />
-        <Route key={"sixStep"} exact path={"/sixStep"} element={SixStep} />
-        <Route key={"sevenStep"} exact path={"/sevenStep"} element={SevenStep} />
-        <Route key={"eightStep"} exact path={"/eightStep"} element={EightStep} />
-        <Route key={"nineStep"} exact path={"/nineStep"} element={NineStep} />
-        <Route key={"tenStep"} exact path={"/tenStep"} element={TenStep} />
-        <Route key={"elevenStep"} exact path={"/elevenStep"} element={ElevenStep} />
-        <Route key={"twelveStep"} exact path={"/twelveStep"} element={TwelveStep} />
-        <Route key={"processing"} exact path={"/processing"} element={Processing} />
-        <Route key={"resultAnalysis"} exact path={"/resultAnalysis"} element={ResultAnalysis} />
-        <Route key={"languages"} exact path={"/languages/:screenName"} element={Languages} />
-        <Route key={"profile"} exact path={"/profile"} element={Profile} />
+          <Route key={"videoTraining"} exact path={"/videoTraining"} element={<VideoTraining />} />
+          <Route key={"addGadget"} exact path={"/addGadget"} element={<AddGadget />} />
+          <Route key={"firstStep"} exact path={"/firstStep"} element={<FirstStep />} />
+          <Route key={"secondStep"} exact path={"/secondStep"} element={<SecondStep />} />
+          <Route key={"thirdStep"} exact path={"/thirdStep"} element={<ThirdStep />} />
+          <Route key={"fourStep"} exact path={"/fourStep"} element={<FourStep />} />
+          <Route key={"fiveStep"} exact path={"/fiveStep"} element={<FiveStep />} />
+          <Route key={"sixStep"} exact path={"/sixStep"} element={<SixStep />} />
+          <Route key={"sevenStep"} exact path={"/sevenStep"} element={<SevenStep />} />
+          <Route key={"eightStep"} exact path={"/eightStep"} element={<EightStep />} />
+          <Route key={"nineStep"} exact path={"/nineStep"} element={<NineStep />} />
+          <Route key={"tenStep"} exact path={"/tenStep"} element={<TenStep />} />
+          <Route key={"elevenStep"} exact path={"/elevenStep"} element={<ElevenStep />} />
+          <Route key={"twelveStep"} exact path={"/twelveStep"} element={<TwelveStep />} />
+          <Route key={"processing"} exact path={"/processing"} element={<Processing />} />
+          {/* <Route key={"resultAnalysis"} exact path={"/resultAnalysis"} element={<ResultAnalysis />} /> */}
+          <Route key={"languages"} exact path={"/languages/:screenName"} element={<Languages/>} />
+       {/* <Route key={"profile"} exact path={"/profile"} element={Profile} />
         <Route key={"editProfile"} exact path={"/editProfile"} element={EditProfile} />
         <Route key={"aboutUs"} exact path={"/aboutUs"} element={AboutUs} />
         <Route key={"discountCode"} exact path={"/discountCode"} element={DiscountCode} />
