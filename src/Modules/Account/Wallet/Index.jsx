@@ -1,104 +1,100 @@
-import React, { Component } from 'react';
-import { TextInput, BackHandler } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-import SimpleHeader from '../../../Components/CustomHeader/SimpleHeader/SimpleHeader';
-import SimpleButton from '../../../Components/CustomButton/SimpleButton';
-import CustomText from '../../../Components/CustomText/CustomText';
-import { ic_user } from '../../../Components/Images/Images';
-import Validity from './Components/Validity/Validity';
-import colors from '../../../Assets/Styles/Colors';
-import language from '../../../Assets/i18n/i18n';
-import Store from '../../../Store/Store';
-import Box from './Components/Box/Box';
+import SimpleHeader from "../../../Components/CustomHeader/SimpleHeader/SimpleHeader";
+import SimpleButton from "../../../Components/CustomButton/SimpleButton";
+import CustomText from "../../../Components/CustomText/CustomText";
+import Validity from "./Components/Validity/Validity";
+import Store from "../../../Store/Store";
+import Box from "./Components/Box/Box";
+import autoBack from "../../../Components/Images/auth_back.jpg"; // Adjusted path
+import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg"; // Adjusted path
+import language from "../../../Assets/i18n/i18n";
 
-class Wallet extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            amount: '',
-            amountList: [
-                { price: '200,000', id: 1 },
-                { price: '400,000', id: 2 },
-                { price: '600,000', id: 3 },
-                { price: '800,000', id: 4 }
-            ],
-            selctedIndex: -1
+function Wallet() {
+    const navigate = useNavigate();
+    const [amount, setAmount] = useState("");
+    const [amountList] = useState([
+        { price: "200,000", id: 1 },
+        { price: "400,000", id: 2 },
+        { price: "600,000", id: 3 },
+        { price: "800,000", id: 4 },
+    ]);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [back, setBack] = useState(autoBackRtl); // Default to RTL image
+
+    useEffect(() => {
+        // Check document direction to set background image
+        if (document.dir !== "rtl") {
+            setBack(autoBack);
+        }
+
+        // Replacing BackHandler with browser back navigation
+        const handleBack = () => {
+            Store.incrementTabBar();
+            navigate(-1);
+            return true;
         };
-    }
+        window.addEventListener("popstate", handleBack);
 
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
+        return () => window.removeEventListener("popstate", handleBack);
+    }, [navigate]);
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButtonClick);
-    }
-
-    handleBackButtonClick = () => {
+    const handleBackButtonClick = () => {
         Store.incrementTabBar();
-        this.props.history.goBack();
-        return true;
-    }
+        navigate(-1);
+    };
 
-    onPressSubmit = () => {
-        alert('');
-    }
+    const onPressSubmit = () => {
+        alert("Submit pressed"); // Placeholder; replace with actual logic if needed
+    };
 
-    onPressSelectAmount(index, item) {
-        this.setState({
-            selctedIndex: index,
-        });
-        alert(item.price);
-    }
+    const onPressSelectAmount = (index, item) => {
+        setSelectedIndex(index);
+        alert(item.price); // Placeholder; replace with actual logic if needed
+    };
 
-    render() {
-        const { selctedIndex } = this.state;
-        return (
-            <div className="flex-1 bg-white">
-                <SimpleHeader
-                    func={this.handleBackButtonClick}
-                    title={'افزایش اعتبار حساب'}
-                />
-                <div className="flex-1 flex-col">
-                    <div className="flex-5 items-center justify-evenly">
-                        <Validity />
-                        <TextInput
-                            style="w-3/5 h-10 font-bold text-sm border border-green-500 rounded-3xl p-2 text-center"
-                            placeholder={'مبلغ دلخواه'}
-                            onChangeText={(e) => this.setState({ amount: e })}
-                            keyboardType={'numeric'}
-                            onSubmitEditing={this.onPressSubmit}
-                        />
-                        <CustomText style="text-sm text-dark_txt">یا</CustomText>
-                    </div>
-                    <div className="flex-5 justify-around">
-                        <div className="w-full self-center">
-                            <div className="grid grid-cols-2 gap-4">
-                                {this.state.amountList.map((item, index) => (
-                                    <Box
-                                        key={item.id}
-                                        func={() => this.onPressSelectAmount(index, item)}
-                                        price={item.price}
-                                        btnStyle={{
-                                            borderColor: selctedIndex === index ? colors.green : colors.ligh_txt,
-                                        }}
-                                        txtStyle={{
-                                            color: selctedIndex === index ? colors.green : colors.ligh_txt,
-                                        }}
-                                    />
-                                ))}
-                            </div>
+    return (
+        <div
+            className="min-h-screen flex flex-col bg-cover bg-center"
+            style={{ backgroundImage: `url(${back})` }}
+        >
+            <SimpleHeader func={handleBackButtonClick} title="افزایش اعتبار حساب" />
+            <div className="flex-1 flex flex-col">
+                <div className="flex-[5] flex items-center justify-evenly">
+                    <Validity />
+                    <input
+                        className="w-3/5 h-10 font-bold text-sm border border-green-500 rounded-3xl p-2 text-center focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="مبلغ دلخواه"
+                        onChange={(e) => setAmount(e.target.value)}
+                        type="number" // Replacing keyboardType="numeric"
+                        onKeyPress={(e) => e.key === "Enter" && onPressSubmit()}
+                    />
+                    <CustomText className="text-sm text-gray-800">یا</CustomText>
+                </div>
+                <div className="flex-[5] flex flex-col justify-around">
+                    <div className="w-full mx-auto">
+                        <div className="grid grid-cols-2 gap-4">
+                            {amountList.map((item, index) => (
+                                <Box
+                                    key={item.id}
+                                    func={() => onPressSelectAmount(index, item)}
+                                    price={item.price}
+                                    selectedIndex={selectedIndex}
+                                    index={index}
+                                />
+                            ))}
                         </div>
-                        <SimpleButton
-                            func={this.onPressSubmit}
-                            btnStyle="w-7/10 self-center h-10"
-                            title={'پرداخت'}
-                        />
                     </div>
+                    <SimpleButton
+                        func={onPressSubmit}
+                        btnStyle="w-7/12 mx-auto h-10 bg-blue-500 text-white rounded-md"
+                        title="پرداخت"
+                    />
                 </div>
             </div>
-        );
-    }
-};
+        </div>
+    );
+}
 
 export default Wallet;

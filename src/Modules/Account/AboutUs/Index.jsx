@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import SimpleHeader from '../../../Components/CustomHeader/SimpleHeader/SimpleHeader';
 import Collapse from '../../../Components/Collapse/Collapse';
-import { logo } from '../../../Components/Images/Images';
-import Store from '../../../Store/Store';
+import logo from '../../../Components/Images/logo.png';
 
-function AboutUs(props) {
+
+function AboutUs({ backAction }) {
 
     return (
         <div className="flex flex-col bg-white h-full">

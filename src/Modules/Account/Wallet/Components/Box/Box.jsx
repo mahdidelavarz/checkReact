@@ -1,31 +1,22 @@
 import React from 'react';
-import { TouchableOpacity, Image } from 'react-native';
-
-import { ic_user } from '../../../../../Components/Images/Images';
+import ic_user from '../../../../../Components/Images/ic_user.png';
 import CustomText from '../../../../../Components/CustomText/CustomText';
 import language from '../../../../../Assets/i18n/i18n';
 
 function Box(props) {
-    const { btnStyle, func, txtStyle, price } = props;
+    const { selectedIndex, index, func, price } = props;
     return (
-        <TouchableOpacity 
-            style={[styles.box, btnStyle]} 
+        <button
+            className={`border-2 rounded-md p-2 ${selectedIndex === index ? 'border-green-500' : 'border-gray-300'}`}
             activeOpacity={0.7}
             onPress={func}
         >
-            <Image style={styles.box_img} source={ic_user} />
-            <CustomText style={[styles.box_price_txt, txtStyle]}>
+            <img className='w-5 h-5' source={ic_user} />
+            <CustomText >
                 {price}
             </CustomText>
-        </TouchableOpacity>
+        </button>
     );
-};
-
-const styles = {
-    box: 'w-11/24 h-12 rounded-full border border-solid border-gray-300 items-center justify-around flex-row mt-3 mx-2',
-    box_img: 'w-5 h-5',
-    box_price_txt: 'text-lg',
-    btn_submit: 'w-7/10 self-center h-10',
 };
 
 export default Box;

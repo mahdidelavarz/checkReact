@@ -1,19 +1,17 @@
-import RNRestart from 'react-native-restart';
-import {I18nManager} from 'react-native';
-import Storage from './Storage';
+import i18n from "i18next"; // Assuming i18n is set up in your project
+import storage from "./Storage"; // Import functional storage directly
 
-let storage = new Storage();
-
-export function changeLang (lang) {
-    if (lang === 'fa') { // تغییر زبان اپلیکیشن به فارسی
-        I18nManager.forceRTL(true);
-        const lang = 'fa';
-        storage.set("Language", lang);
-        RNRestart.Restart();
-    } else {
-        I18nManager.forceRTL(false); // تغییر زبان اپلیکیشن به انگلیسی
-        const lang = 'en';
-        storage.set("Language", lang);
-        RNRestart.Restart();
-    }
-};
+export function changeLang(lang) {
+  if (lang === "fa") {
+    // Change language to Persian (Farsi) and set RTL
+    document.dir = "rtl"; // Set document direction to RTL
+    i18n.changeLanguage("fa"); // Update i18n language
+    storage.set("Language", "fa"); // Persist language choice
+  } else {
+    // Change language to English and set LTR
+    document.dir = "ltr"; // Set document direction to LTR
+    i18n.changeLanguage("en"); // Update i18n language
+    storage.set("Language", "en"); // Persist language choice
+  }
+  // No restart needed; web updates dynamically via i18n
+}

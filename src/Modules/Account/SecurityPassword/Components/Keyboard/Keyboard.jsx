@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { div, button, span } from 'react-native';
 
 function Keyboard(props) {
     const [numbers] = useState([

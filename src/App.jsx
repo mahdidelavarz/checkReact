@@ -26,21 +26,18 @@ import TextTraining from './Modules/TextTraining/Index';
 import VideoTraining from './Modules/VideoTraining/Index';
 import HistoryDetails from './Modules/Account/HistoryDetails/Index';
 import Languages from './Modules/Languages/Index';
-// import EditProfile from './Modules/Account/EditProfile/Index';
-// import Profile from './Modules/Account/Profile/Index';
-// import AboutUs from './Modules/Account/AboutUs/Index';
-// import DiscountCode from './Modules/Account/DiscountCode/Index';
-// import ContactSupport from './Modules/Account/ContactSupport/Index';
-// import Invite from './Modules/Account/Invite/Index';
-// import SecurityPassword from './Modules/Account/SecurityPassword/Index';
-// import Share from './Modules/Account/Share/Index';
-// import Wallet from './Modules/Account/Wallet/Index';
-// import ResultImg from './Modules/Account/ResultImg/Index';
-// import ResultVideo from './Modules/Account/ResultVideo/Index';
-// import Update from './Modules/Account/Update/Index';
+import EditProfile from './Modules/Account/EditProfile/Index';
+import Profile from './Modules/Account/Profile/Index';
+import AboutUs from './Modules/Account/AboutUs/Index';
+import DiscountCode from './Modules/Account/DiscountCode/Index';
+import ContactSupport from './Modules/Account/ContactSupport/Index';
+import Invite from './Modules/Account/Invite/Index';
+import SecurityPassword from './Modules/Account/SecurityPassword/Index';
+import Share from './Modules/Account/Share/Index';
+import Wallet from './Modules/Account/Wallet/Index';
+import ResultImg from './Modules/Account/ResultImg/Index';
+import ResultVideo from './Modules/Account/ResultVideo/Index';
 import NewPassword from './Modules/Account/NewPassword/Index';
-
-// // analysis steps screen
 import AddGadget from './Modules/AnalysisSteps/AddGadget/Index';
 import FirstStep from './Modules/AnalysisSteps/FirstStep/Index';
 import SecondStep from './Modules/AnalysisSteps/SecondStep/Index';
@@ -59,8 +56,6 @@ import Processing from './Modules/AnalysisSteps/Processing/Index';
 
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <I18nextProvider i18n={i18next}>
       <ToastContainer />
@@ -76,7 +71,6 @@ function App() {
           <Route key={"newPassword"} exact path={"/newPassword"} element={<NewPassword />} />
           <Route key={"confirmCode"} exact path={"/confirmCode/:userId"} element={<ConfirmCode />} />
           <Route key={"conditions"} exact path={"/conditions"} element={<Conditions />} />
-          {/* <Route key={"update"} exact path={"/update"} element={<Update/>} /> */}
           <Route key={"tabBar"} exact path={"/tabBar"} element={<TabBar />} />
           <Route key={"categories"} exact path={"/categories"} element={<Categories />} />
           <Route key={"treatmentCenters"} exact path={"/treatmentCenters/:id"} element={<TreatmentCenters />} />
@@ -102,19 +96,18 @@ function App() {
           <Route key={"twelveStep"} exact path={"/twelveStep"} element={<TwelveStep />} />
           <Route key={"processing"} exact path={"/processing"} element={<Processing />} />
           {/* <Route key={"resultAnalysis"} exact path={"/resultAnalysis"} element={<ResultAnalysis />} /> */}
-          <Route key={"languages"} exact path={"/languages/:screenName"} element={<Languages/>} />
-       {/* <Route key={"profile"} exact path={"/profile"} element={Profile} />
-        <Route key={"editProfile"} exact path={"/editProfile"} element={EditProfile} />
-        <Route key={"aboutUs"} exact path={"/aboutUs"} element={AboutUs} />
-        <Route key={"discountCode"} exact path={"/discountCode"} element={DiscountCode} />
-        <Route key={"contactSupport"} exact path={"/contactSupport"} element={ContactSupport} />
-        <Route key={"invite"} exact path={"/invite"} element={Invite} />
-        <Route key={"securityPassword"} exact path={"/securityPassword"} element={SecurityPassword} />
-        <Route key={"share"} exact path={"/share"} element={Share} />
-        <Route key={"wallet"} exact path={"/wallet"} element={Wallet} />
-        <Route key={"resultImg"} exact path={"/resultImg/:id"} element={ResultImg} />
-        <Route key={"resultVideo"} exact path={"/resultVideo/:id"} element={ResultVideo} /> */}
-
+          <Route key={"languages"} exact path={"/languages/:screenName"} element={<Languages />} />
+          <Route key={"profile"} exact path={"/profile"} element={<Profile />} />
+          <Route key={"editProfile"} exact path={"/editProfile"} element={<EditProfile />} />
+          <Route key={"aboutUs"} exact path={"/aboutUs"} element={<AboutUs />} />
+          <Route key={"discountCode"} exact path={"/discountCode"} element={<DiscountCode />} />
+          <Route key={"contactSupport"} exact path={"/contactSupport"} element={<ContactSupport />} />
+          <Route key={"invite"} exact path={"/invite"} element={<Invite />} />
+          <Route key={"securityPassword"} exact path={"/securityPassword"} element={<SecurityPassword />} />
+          <Route key={"share"} exact path={"/share"} element={<Share />} />
+          <Route key={"wallet"} exact path={"/wallet"} element={<Wallet />} />
+          <Route key={"resultImg"} exact path={"/resultImg/:id"} element={<ResultImg />} />
+          <Route key={"resultVideo"} exact path={"/resultVideo/:id"} element={<ResultVideo />} />
         </Routes>
       </Router>
     </I18nextProvider>

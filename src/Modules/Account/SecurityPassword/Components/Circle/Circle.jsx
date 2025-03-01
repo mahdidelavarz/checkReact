@@ -1,8 +1,6 @@
 import React from 'react';
-import { div } from 'react-native';
 
 import CustomText from '../../../../../Components/CustomText/CustomText';
-import colors from '../../../../../Assets/Styles/Colors';
 
 function Circle(props) {
     const { number } = props;
