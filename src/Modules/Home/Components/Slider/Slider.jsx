@@ -11,11 +11,11 @@ const width = window.innerWidth;
 const CustomSlider = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const sliderRef = useRef(null);
-  
+
   const data = [
-    { img: "/Images/clip.png" },
-    { img: "/Images/clip.png" },
-    { img: "/Images/clip.png" }
+    { img: "/assets/Images/clip.png" },
+    { img: "/assets/Images/clip.png" },
+    { img: "/assets/Images/clip.png" }
   ];
 
   const settings = {
@@ -31,9 +31,8 @@ const CustomSlider = () => {
     afterChange: (current) => setActiveIndex(current), // equivalent to onSnapToItem
     customPaging: (i) => (
       <button
-        className={`w-4 h-2 rounded-full mx-1 ${
-          i === activeIndex ? 'bg-green-500' : 'bg-gray-400 opacity-40'
-        }`}
+        className={`w-4 h-2 rounded-full mx-1 ${i === activeIndex ? 'bg-green-500' : 'bg-gray-400 opacity-40'
+          }`}
       />
     ),
     dotsClass: 'slick-dots absolute bottom-[-25px] right-5 flex justify-end', // Custom dot positioning
@@ -42,7 +41,7 @@ const CustomSlider = () => {
 
   const renderItem = ({ item }) => {
     return (
-      <button className="rounded-xl focus:outline-none" onClick={() => {}}>
+      <button className="rounded-xl focus:outline-none" onClick={() => { }}>
         <img
           className="w-full h-full rounded-xl object-cover"
           src={item.img}

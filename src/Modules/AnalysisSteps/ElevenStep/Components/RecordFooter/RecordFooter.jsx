@@ -3,7 +3,7 @@ import { View, Button, Image } from 'react-native';
 
 import CustomText from '../../../../../Components/CustomText/CustomText';
 import { ic_refresh, ic_arrow } from '../../../../../Components/Images/Images';
-// import colors from '../../../../../Assets/Styles/Colors';
+// import colors from '../../../../../assets/Styles/Colors';
 
 function RecordFooter(props) {
     const { step, rightFunc, rightTxt, leftFunc, leftTxt, refresh } = props;

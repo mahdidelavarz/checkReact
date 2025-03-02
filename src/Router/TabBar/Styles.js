@@ -1,6 +1,6 @@
 // import { StyleSheet, Dimensions } from 'react-native';
 //! check the related component
-// import colors from '../../Assets/Styles/Colors';
+// import colors from '../../assets/Styles/Colors';
 
 // const styles = const styles = {
 //     tabbar: {

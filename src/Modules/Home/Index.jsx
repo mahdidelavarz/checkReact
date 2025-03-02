@@ -110,7 +110,7 @@ function Home() {
 
   const onPressGoToHistoryScreen = () => {
     setIsResultReadyModal(false);
-    navigate("/history");
+    navigate("/qRCodeScan");
   };
 
   return (
@@ -120,7 +120,7 @@ function Home() {
       >
         <img
           className="w-48 h-12 object-contain"
-          src="/Images/logo.png"
+          src="/assets/Images/logo.png"
           alt="Logo"
         />
       </header>
@@ -134,27 +134,27 @@ function Home() {
           <BoxButton
             func={onPressGoToAnalysisScreen}
             title={language("online_sperm_analyze")}
-            img="/Images/sperm_analysis.png"
+            img="/assets/Images/sperm_analysis.png"
           />
           <BoxButton
             func={() => navigate("/categories")}
             title={language("centers_search")}
-            img="/Images/specia_list.png"
+            img="/assets/Images/specia_list.png"
           />
           <BoxButton
             func={() => navigate("/videoTraining")}
             title={language("video_training")}
-            img="/Images/videoSuccess.png"
+            img="/assets/Images/videoSuccess.png"
           />
           <BoxButton
             func={() => navigate("/textTraining")}
             title={language("text_training")}
-            img="/Images/text_education.png"
+            img="/assets/Images/text_education.png"
           />
           <BoxButton
             func={onPressGoToHistoryScreen}
             title={language("history")}
-            img="/Images/analytsis_history.png"
+            img="/assets/Images/analytsis_history.png"
           />
           <BoxButton
             func={() =>
@@ -163,7 +163,7 @@ function Home() {
               )
             }
             title={language("training_of_medical_staff")}
-            img="/Images/health_education.png"
+            img="/assets/Images/health_education.png"
           />
         </div>
       </main>
@@ -174,7 +174,7 @@ function Home() {
 
       <SimpleModal
         isVisible={isResultReadyModal}
-        img="/Images/ic_analysis"
+        img="/assets/Images/ic_analysis"
         title="آنالیز"
         isReady={true}
         description={descriptionModal}

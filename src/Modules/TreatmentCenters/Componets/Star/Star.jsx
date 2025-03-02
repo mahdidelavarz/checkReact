@@ -1,6 +1,6 @@
 import React from 'react';
 
-// import colors from '../../../../Assets/Styles/Colors';
+// import colors from '../../../../assets/Styles/Colors';
 
 function Star(props) {
     // const { star } = props;
