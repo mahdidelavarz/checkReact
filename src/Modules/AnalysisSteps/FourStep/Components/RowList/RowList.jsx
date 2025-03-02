@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import icArrow from "../../../../../Components/Images/ic_arrow.png"; // Direct import
 import CustomText from "../../../../../Components/CustomText/CustomText";
 import { sampleGranular, sampleColors, sampleVolume } from "./Data";
-import languages from "../../../../../Assets/i18n/i18n";
+import languages from "../../../../../assets/i18n/i18n";
 import storage from "../../../../../Factories/Storage";
 import SlideModal from "../SlideModal/SlideModal";
 

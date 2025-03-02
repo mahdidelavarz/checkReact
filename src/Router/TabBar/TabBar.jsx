@@ -8,7 +8,7 @@ import icUser from "../../Components/Images/ic_user.png";
 import icHome from "../../Components/Images/ic_home.png";
 import icExitApp from "../../Components/Images/ic_exit_app.png";
 import CustomText from "../../Components/CustomText/CustomText";
-import language from "../../Assets/i18n/i18n";
+import language from "../../assets/i18n/i18n";
 import Store from "../../Store/Store";
 import Profile from "../../Modules/Account/Profile/Index";
 import Home from "../../Modules/Home/Index";

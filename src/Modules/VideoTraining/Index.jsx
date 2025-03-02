@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs"; // Replacing TabView and TabBar
 import ReactPlayer from "react-player"; // Replacing Video
 import SimpleHeader from "../../Components/CustomHeader/SimpleHeader/SimpleHeader";
-import languages from "../../Assets/i18n/i18n";
+import languages from "../../assets/i18n/i18n";
 import autoBack from "../../Components/Images/auth_back.jpg"; // Added per your instruction
 import autoBackRtl from "../../Components/Images/auth_back_rtl.jpg";
 import CustomText from "../../Components/CustomText/CustomText"; // Assuming web-compatible replacement for Text

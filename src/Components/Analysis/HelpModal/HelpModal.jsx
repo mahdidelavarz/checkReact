@@ -1,6 +1,6 @@
 import React from "react";
 import CustomText from "../../CustomText/CustomText";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import helpCircle from "../../../Components/Images/help_circle.png"; // Direct import
 
 const HelpModal = ({ visible, closeFunc, description }) => {

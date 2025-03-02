@@ -10,7 +10,7 @@ import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomInput from "../../../Components/CustomInput/CustomInput";
 import CustomText from "../../../Components/CustomText/CustomText";
 import { findMessages } from "../../../Filters/Filters";
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
 import Store from "../../../Store/Store";

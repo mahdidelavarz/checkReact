@@ -15,7 +15,7 @@ import Loading from "../../../Components/Loading/Loading";
 // !emptyList is imported from current path but it dose not exist
 import EmptyList from "./Components/EmptyList/EmptyList";
 import { Url } from "../../../Configs/Urls";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage"; // Import functional storage
 
 let Token;

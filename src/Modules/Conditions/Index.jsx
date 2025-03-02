@@ -9,7 +9,7 @@ import icChangeLang from "../../Components/Images/ic_change_lang.png";
 import icCircle from "../../Components/Images/ic_circle.png";
 import icCircleCheck from "../../Components/Images/ic_circle_check.png";
 import CustomText from "../../Components/CustomText/CustomText";
-import language from "../../Assets/i18n/i18n";
+import language from "../../assets/i18n/i18n";
 
 function Conditions() {
   const navigate = useNavigate();

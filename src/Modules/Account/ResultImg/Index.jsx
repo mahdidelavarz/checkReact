@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom"; // Replacing BackHandler and props.history
 import SimpleHeader from "../../../Components/CustomHeader/SimpleHeader/SimpleHeader";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage"; // Import functional storage
 
 function ResultImg() {

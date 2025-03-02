@@ -10,7 +10,7 @@ import SimpleHeader from "../../Components/CustomHeader/SimpleHeader/SimpleHeade
 import SimpleButton from "../../Components/CustomButton/SimpleButton";
 import CustomText from "../../Components/CustomText/CustomText";
 import { changeLang } from "../../Factories/ChangeLang";
-import languages from "../../Assets/i18n/i18n";
+import languages from "../../assets/i18n/i18n";
 import autoBack from "../../Components/Images/auth_back.jpg"; // Adjusted path per your instruction
 import autoBackRtl from "../../Components/Images/auth_back_rtl.jpg"; // Adjusted path per your instruction
 

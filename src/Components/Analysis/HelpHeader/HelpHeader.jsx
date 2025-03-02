@@ -2,7 +2,7 @@ import React from "react";
 import icClose from "../../Images/ic_close.png"; // Direct import
 import icHelp from "../../Images/ic_help.png"; // Direct import
 import CustomText from "../../CustomText/CustomText";
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 
 const HelpHeader = ({ closeFunc, helpFunc, count }) => {
   return (

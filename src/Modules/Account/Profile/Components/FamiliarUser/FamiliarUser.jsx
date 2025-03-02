@@ -16,7 +16,7 @@ import icExitApp from "../../../../../Components/Images/ic_exit_app.png";
 import SimpleModal from "../../../../../Components/CustomModal/SimpleModal/SimpleModal";
 import CustomText from "../../../../../Components/CustomText/CustomText";
 import { statusHandle } from "../../../../../Factories/HttpHandler";
-import languages from "../../../../../Assets/i18n/i18n";
+import languages from "../../../../../assets/i18n/i18n";
 import storage from "../../../../../Factories/Storage";
 import { Url } from "../../../../../Configs/Urls";
 import Store from "../../../../../Store/Store";

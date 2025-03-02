@@ -1,4 +1,4 @@
-import languages from '../../../../../Assets/i18n/i18n';
+import languages from '../../../../../assets/i18n/i18n';
 
 export const sampleGranular = [
     { value: languages('normal') },

@@ -7,7 +7,7 @@ import LoadingModal from "../../Components/CustomModal/LoadingModal/LoadingModal
 import CustomText from "../../Components/CustomText/CustomText";
 import emptyImage from "../../Components/Images/empty_image.png"; // Direct import
 import Loading from "../../Components/Loading/Loading";
-import language from "../../Assets/i18n/i18n";
+import language from "../../assets/i18n/i18n";
 import storage from "../../Factories/Storage";
 import { CDN_Url } from "../../Configs/Urls";
 import autoBack from "../../Components/Images/auth_back.jpg"; // Updated per your instruction

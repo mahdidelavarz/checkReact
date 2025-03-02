@@ -11,7 +11,7 @@ import Footer from "../../../Components/Analysis/Footer/Footer";
 import icCup from "../../../Components/Images/ic_cup.png"; // Direct import
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Added per your instruction
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 
 function ThirdStep() {
   const navigate = useNavigate();

@@ -7,7 +7,7 @@ import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomText from "../../../Components/CustomText/CustomText";
 import Keyboard from "./Components/Keyboard/Keyboard";
 import storage from "../../../Factories/Storage"; // Functional storage
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 import Circle from "./Components/Circle/Circle";
 import Store from "../../../Store/Store";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Adjusted path

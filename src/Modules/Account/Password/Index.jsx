@@ -6,7 +6,7 @@ import autoBack from "../../../Components/Images/auth_back.jpg"; // Import image
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
 import SimpleButton from "../../../Components/CustomButton/SimpleButton";
 import CustomText from "../../../Components/CustomText/CustomText";
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 
 function Password() {

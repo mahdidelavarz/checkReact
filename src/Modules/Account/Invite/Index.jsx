@@ -6,7 +6,7 @@ import inviteBack from "../../../Components/Images/inviteBack.png"; // Direct im
 import icBack from "../../../Components/Images/ic_back.png"; // Direct import
 import CustomText from "../../../Components/CustomText/CustomText";
 import storage from "../../../Factories/Storage"; // Functional storage
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 import Store from "../../../Store/Store";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Fallback background
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg"; // Fallback background

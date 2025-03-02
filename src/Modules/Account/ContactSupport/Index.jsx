@@ -8,7 +8,6 @@ import CustomText from "../../../Components/CustomText/CustomText";
 import Store from "../../../Store/Store";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Fallback background
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg"; // Fallback background
-import language from "../../../Assets/i18n/i18n";
 
 function ContactSupport() {
   const navigate = useNavigate();

@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom"; // Replacing Link from react-router-native
 import classNames from "classnames";
 import CustomText from "../../CustomText/CustomText";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import alert from "../../../Components/Images/alert.png"; // Direct import
 
 function CloseModal({ visible, resumeFunc }) {

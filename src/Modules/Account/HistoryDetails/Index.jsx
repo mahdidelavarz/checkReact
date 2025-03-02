@@ -11,7 +11,7 @@ import happyBoy from "../../../Components/Images/happy_boy.png"; // Direct impor
 import { CustomPDF } from "./Components/CustomPDF/CustomPDF";
 import Loading from "../../../Components/Loading/Loading";
 import { findMessages } from "../../../Filters/Filters";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Updated per your instruction

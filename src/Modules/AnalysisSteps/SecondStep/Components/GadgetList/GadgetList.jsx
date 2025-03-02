@@ -6,7 +6,7 @@ import  ic_date  from "../../../../../Components/Images/ic_date.png";
 import  ic_about  from "../../../../../Components/Images/ic_about.png";
 import ic_barcode  from "../../../../../Components/Images/ic_barcode.png";
 import CustomText from "../../../../../Components/CustomText/CustomText";
-import languages from "../../../../../Assets/i18n/i18n";
+import languages from "../../../../../assets/i18n/i18n";
 import storage from "../../../../../Factories/Storage"; // Import functional storage
 
 function GadgetList({ data, func }) {

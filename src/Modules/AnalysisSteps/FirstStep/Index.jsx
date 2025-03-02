@@ -18,7 +18,7 @@ import CheckBtn from "../../../Components/Analysis/CheckBtn/CheckBtn";
 import CustomText from "../../../Components/CustomText/CustomText";
 import Footer from "../../../Components/Analysis/Footer/Footer";
 import Loading from "../../../Components/Loading/Loading";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 
 let Token;

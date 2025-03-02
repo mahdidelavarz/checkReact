@@ -2,7 +2,7 @@ import React from "react";
 import gadget from "../../../../../Components/Images/gadget.png"; // Direct import
 import icClose from "../../../../../Components/Images/ic_close.png"; // Direct import
 import CustomText from "../../../../../Components/CustomText/CustomText";
-import language from "../../../../../Assets/i18n/i18n";
+import language from "../../../../../assets/i18n/i18n";
 
 function EmptyList() {
   return (

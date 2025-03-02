@@ -1,6 +1,6 @@
 import React from "react";
 import CustomText from "../../../../Components/CustomText/CustomText";
-import language from "../../../../Assets/i18n/i18n";
+import language from "../../../../assets/i18n/i18n";
 
 function RulesModal({ isVisible, closeFunc }) {
     if (!isVisible) return null; // Conditional render instead of Modal's visible prop

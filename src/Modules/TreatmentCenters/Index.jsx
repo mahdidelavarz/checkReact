@@ -14,7 +14,7 @@ import FilterModal from "./Componets/FilterModal/FilterModal"; // Assuming 'Comp
 import SearchModal from "./Componets/SearchModal/SearchModal";
 import Loading from "../../Components/Loading/Loading";
 import Header from "./Componets/Header/Header";
-import language from "../../Assets/i18n/i18n";
+import language from "../../assets/i18n/i18n";
 import storage from "../../Factories/Storage";
 
 function TreatmentCenters() {

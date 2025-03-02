@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking } from 'react-native';
 
 import { ic_home } from '../../../../Components/Images/Images';
-import language from '../../../../Assets/i18n/i18n';
+import language from '../../../../assets/i18n/i18n';
 import SimpleRow from '../SimpleRow/SimpleRow';
 
 function Social(props) {

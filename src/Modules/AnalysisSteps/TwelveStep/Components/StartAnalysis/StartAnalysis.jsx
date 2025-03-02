@@ -3,7 +3,7 @@ import { Image } from 'react-native';
 
 import CustomText from '../../../../../Components/CustomText/CustomText';
 import { loading, ic_ok } from '../../../../../Components/Images/Images';
-import languages from '../../../../../Assets/i18n/i18n';
+import languages from '../../../../../assets/i18n/i18n';
 
 function StartAnalysis(props) {
     useEffect(() => {

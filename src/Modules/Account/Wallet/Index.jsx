@@ -9,7 +9,7 @@ import Store from "../../../Store/Store";
 import Box from "./Components/Box/Box";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Adjusted path
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg"; // Adjusted path
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 
 function Wallet() {
     const navigate = useNavigate();

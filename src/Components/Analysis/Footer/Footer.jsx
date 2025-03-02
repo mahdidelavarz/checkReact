@@ -1,7 +1,7 @@
 import React from "react";
 import icArrow from "../../../Components/Images/ic_arrow.png"; // Direct import
 import CustomText from "../../CustomText/CustomText";
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 import classNames from "classnames";
 
 const Footer = ({ nextFunc, screenCount, backFunc, line }) => {

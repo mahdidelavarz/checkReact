@@ -13,7 +13,7 @@ import GadgetList from "./Components/GadgetList/GadgetList";
 import Loading from "../../../Components/Loading/Loading";
 import EmptyList from "./Components/EmptyList/EmptyList";
 import { Url } from "../../../Configs/Urls";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Added per your instruction
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";

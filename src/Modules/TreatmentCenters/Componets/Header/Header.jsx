@@ -2,7 +2,7 @@ import React from "react";
 import icBack from "../../../../Components/Images/ic_back.png"; // Direct imports
 import icLeftBack from "../../../../Components/Images/ic_left_back.png";
 import icFilter from "../../../../Components/Images/ic_filter.png";
-import language from "../../../../Assets/i18n/i18n";
+import language from "../../../../assets/i18n/i18n";
 
 function Header({ func_back, func_filter, event }) {
     const isRTL = document.dir === "rtl"; // Replacing I18nManager.isRTL

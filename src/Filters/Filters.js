@@ -1,5 +1,5 @@
 import storage from "../Factories/Storage";
-import i18next from '../Assets/i18n/i18n'
+import i18next from '../assets/i18n/i18n'
 
 
 

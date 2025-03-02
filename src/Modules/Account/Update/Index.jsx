@@ -5,8 +5,7 @@ import SimpleHeader from '../../../Components/CustomHeader/SimpleHeader/SimpleHe
 import SimpleButton from '../../../Components/CustomButton/SimpleButton';
 import CustomText from '../../../Components/CustomText/CustomText';
 import Loading from '../../../Components/Loading/Loading';
-import colors from '../../../Assets/Styles/Colors';
-import language from '../../../Assets/i18n/i18n';
+import language from '../../../assets/i18n/i18n';
 import Store from '../../../Store/Store';
 
 function Update(props) {

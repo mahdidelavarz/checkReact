@@ -4,7 +4,7 @@ import videoSuccess from "../../../../../Components/Images/videoSuccess.png"; //
 import icOk from "../../../../../Components/Images/ic_ok.png"; // Direct import
 import icClose from "../../../../../Components/Images/ic_close.png"; // Direct import
 import CustomText from "../../../../../Components/CustomText/CustomText";
-import languages from "../../../../../Assets/i18n/i18n";
+import languages from "../../../../../assets/i18n/i18n";
 
 function ThreeStepRecord({ step, footerNextFunc, footerAgainFunc, status }) {
   return (

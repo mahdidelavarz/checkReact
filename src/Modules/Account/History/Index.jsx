@@ -7,7 +7,7 @@ import CustomText from "../../../Components/CustomText/CustomText";
 import { statusHandle } from "../../../Factories/HttpHandler";
 import Loading from "../../../Components/Loading/Loading";
 import EmptyList from "./Components/EmptyList/EmptyList";
-import language from "../../../Assets/i18n/i18n";
+import language from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 import Header from "./Components/Header/Header";
 import Chart from "./Components/Chart/Chart";

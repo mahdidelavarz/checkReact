@@ -3,7 +3,7 @@ import icLocation from "../../../../Components/Images/ic_location.png"; // Direc
 import icArrow from "../../../../Components/Images/ic_arrow.png";
 import icPhone from "../../../../Components/Images/ic_phone.png";
 import CustomText from "../../../../Components/CustomText/CustomText";
-import language from "../../../../Assets/i18n/i18n";
+import language from "../../../../assets/i18n/i18n";
 
 function SearchModal({ data, route }) {
   const onPressItem = (item) => {

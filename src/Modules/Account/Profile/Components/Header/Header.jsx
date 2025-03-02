@@ -2,7 +2,7 @@ import React from "react";
 import profileBack from "../../../../../Components/Images/auth_back.jpg"; // Updated per your instruction
 import icUser from "../../../../../Components/Images/ic_user.png";
 import CustomText from "../../../../../Components/CustomText/CustomText";
-import languages from "../../../../../Assets/i18n/i18n";
+import languages from "../../../../../assets/i18n/i18n";
 
 function Header({ userName }) {
     return (

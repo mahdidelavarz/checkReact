@@ -1,10 +1,9 @@
 import React from 'react';
-import { img, StyleSheet } from 'react-native';
 
-import colors from '../../../../Assets/Styles/Colors';
+// import colors from '../../../../Assets/Styles/Colors';
 
 function Star(props) {
-    const { star } = props;
+    // const { star } = props;
     return (
         <div></div>
         // <Stars
@@ -16,11 +15,11 @@ function Star(props) {
         // />
     );
 };
-const styles = {
-    star_img: {
-        width: 20,
-        height: 20,
-        marginLeft: 1,
-    }
-};;
+// const styles = {
+//     star_img: {
+//         width: 20,
+//         height: 20,
+//         marginLeft: 1,
+//     }
+// };
 export default Star;

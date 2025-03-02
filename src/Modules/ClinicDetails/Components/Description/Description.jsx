@@ -1,7 +1,7 @@
 import React from "react";
 import icDescription from "../../../../Components/Images/ic_description.png"; // Direct import
 import CustomText from "../../../../Components/CustomText/CustomText";
-import language from "../../../../Assets/i18n/i18n";
+import language from "../../../../assets/i18n/i18n";
 import SimpleRow from "../SimpleRow/SimpleRow";
 
 const Description = ({ description }) => {

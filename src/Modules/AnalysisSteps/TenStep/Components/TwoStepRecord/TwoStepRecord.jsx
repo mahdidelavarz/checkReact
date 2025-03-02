@@ -2,7 +2,7 @@ import React from "react";
 import CustomText from "../../../../../Components/CustomText/CustomText";
 import Footer from "../../../../../Components/Analysis/Footer/Footer";
 import recVideo from "../../../../../Components/Images/recVideo.png"; // Direct import
-import languages from "../../../../../Assets/i18n/i18n";
+// import languages from "../../../../../assets/i18n/i18n";
 import { toast } from "react-toastify"; // Replacing Alert
 
 function TwoStepRecord({ title, description, func, footerNextFunc, pageCount }) {

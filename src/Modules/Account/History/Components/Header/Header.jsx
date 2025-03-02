@@ -4,7 +4,7 @@ import icLeftBack from "../../../../../Components/Images/ic_left_back.png";
 import icSearch from "../../../../../Components/Images/ic_search.png";
 import icClose from "../../../../../Components/Images/ic_close.png";
 import CustomText from "../../../../../Components/CustomText/CustomText";
-import language from "../../../../../Assets/i18n/i18n";
+import language from "../../../../../assets/i18n/i18n";
 
 function Header({ func_back, event }) {
     const [isVisibleInput, setIsVisibleInput] = useState(false);

@@ -10,7 +10,7 @@ import CustomText from "../../../Components/CustomText/CustomText";
 import Footer from "../../../Components/Analysis/Footer/Footer";
 import { statusHandle } from "../../../Factories/HttpHandler";
 import RowList from "./Components/RowList/RowList";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 import storage from "../../../Factories/Storage";
 import { Url } from "../../../Configs/Urls";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Added per your instruction

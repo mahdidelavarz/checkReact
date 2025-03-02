@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import icLeftBack from "../../Components/Images/ic_left_back.png"; // Direct import
 import SimpleHeader from "../../Components/CustomHeader/SimpleHeader/SimpleHeader";
 import RulesModal from "./Components/RulesModal/RulesModal";
-import languages from "../../Assets/i18n/i18n";
+import languages from "../../assets/i18n/i18n";
 import Slide from "./Components/Slide/Slide";
 import autoBack from "../../Components/Images/auth_back.jpg"; // Added per your instruction
 import autoBackRtl from "../../Components/Images/auth_back_rtl.jpg";

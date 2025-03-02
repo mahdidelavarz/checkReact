@@ -10,7 +10,7 @@ import BoxButton from "./Components/BoxButton/BoxButton";
 import Slider from "./Components/Slider/Slider";
 import Banner from "./Components/Banner/Banner";
 import storage from "../../Factories/Storage"; // Import functional storage
-import language from "../../Assets/i18n/i18n";
+import language from "../../assets/i18n/i18n";
 import { Url } from "../../Configs/Urls";
 
 let Token;

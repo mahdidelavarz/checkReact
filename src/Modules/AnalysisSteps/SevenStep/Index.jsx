@@ -12,7 +12,7 @@ import CupFill from "../../../Components/Images/ic_cup.png"; // Direct import
 import Footer from "../../../Components/Analysis/Footer/Footer";
 import autoBack from "../../../Components/Images/auth_back.jpg"; // Added per your instruction
 import autoBackRtl from "../../../Components/Images/auth_back_rtl.jpg";
-import languages from "../../../Assets/i18n/i18n";
+import languages from "../../../assets/i18n/i18n";
 
 function SevenStep() {
   const navigate = useNavigate();
